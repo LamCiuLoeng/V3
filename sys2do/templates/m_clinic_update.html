@@ -1,0 +1,134 @@
+{% extends "master.html" %}
+
+{% set current_tab = "t4" %}
+
+{% block extJS %}
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+		var map =new google.maps.Map($("#gmap")[0],{
+				zoom : 12,
+				mapTypeId:google.maps.MapTypeId.ROADMAP,
+				minZoom:10,
+                maxZoom:18,
+                center: new google.maps.LatLng(22.396428, 114.0274970)  //hong kong lat and lng
+			});
+		
+		{% if clinic.location[0] and clinic.location[1] %}	
+			var current_marker = new google.maps.Marker({
+			      position: new google.maps.LatLng({{clinic.location[0]}}, {{clinic.location[1]}}),
+			      map: map
+			});			
+			map.setCenter(current_marker.position);
+		{% else %}
+			var current_marker = null;
+		{% endif %}
+		
+		google.maps.event.addListener(map, 'click', function(event) {
+		     var marker = new google.maps.Marker({
+			      position: event.latLng, 
+			      map: map
+			  });
+             if(current_marker){
+		         current_marker.setMap(null);
+             }
+             current_marker = marker;
+			 map.setCenter(event.latLng);
+             $("#lat").val(event.latLng.lat());
+			 $("#lng").val(event.latLng.lng());
+		});
+		
+		$("form").submit(function(){
+			var msg = [];
+			if(!$("#name").val()){
+				msg.push("Please fill in the clinic name !");
+			}
+			
+			if(msg.length>0){
+				var content = "";
+				for(var i=0;i<msg.length;i++){
+					content += "<li>" + msg[i] + "</li>";
+				}
+				$.pnotify({
+					    pnotify_text: '<div class="error"><ul>'+content+'</ul></div>',
+					    pnotify_nonblock: true,
+					    pnotify_mouse_reset: false
+					});
+				return false;			
+			}
+		});
+		
+	});
+//]]>
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="grey_box">
+	<div class="yellow_box height_600">
+		<form action="/m_clinic_save" method="post" enctype="multipart/form-data" class="baseform">
+			<input type="hidden" name="type" value="UPDATE"/>
+			<input type="hidden" name="id" value="{{clinic.id}}"/>
+			<input type="hidden" name="lat" id="lat" value="{{clinic.location[0]}}"/>
+			<input type="hidden" name="lng" id="lng" value="{{clinic.location[1]}}"/>
+		
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			  <tr>
+			    <td width="130">&nbsp;</td>
+			    <td width="150" align="right" class="input_left_title">Clinic Name</td>
+			    <td><input type="text" name="name" id="name" value="{{clinic.name|ifFalse('')}}" class="field"/></td>
+			    <td>&nbsp;</td>
+		      </tr>
+			  <tr>
+			    <td>&nbsp;</td>
+			    <td align="right" class="input_left_title">Website</td>
+			    <td><input type="text" name="website" id="website" value="{{clinic.website|ifFalse('')}}" class="field"/></td>
+			    <td>&nbsp;</td>
+		      </tr>
+			  <tr>
+			    <td>&nbsp;</td>
+			    <td align="right" class="input_left_title">Address</td>
+			    <td><textarea name="address" id="address" class="field">{{clinic.address|ifFalse('')}}</textarea></td>
+			    <td>&nbsp;</td>
+		      </tr>
+			  <tr>
+			    <td>&nbsp;</td>
+			    <td align="right" class="input_left_title">Description</td>
+			    <td><textarea name="desc" id="desc" class="field">{{clinic.desc|ifFalse('')}}</textarea></td>
+			    <td>&nbsp;</td>
+		      </tr>
+			  <tr>
+			    <td>&nbsp;</td>
+			    <td align="right" class="input_left_title">Image</td>
+			    <td><input type="file" name="image_url" class="field"/></td>
+			    <td>&nbsp;</td>
+		      </tr>
+			  <tr>
+			    <td valign="middle">&nbsp;</td>
+			    <td align="right" class="input_left_title">Location</td>
+			    <td><div id="gmap" style="width:500px;height:300px;margin-left:20px; border:#666 solid 6px"></div></td>
+			    <td>&nbsp;</td>
+		      </tr>
+			  <tr>
+			    <td>&nbsp;</td>
+			    <td>&nbsp;</td>
+			    <td>&nbsp;</td>
+			    <td>&nbsp;</td>
+		      </tr>
+			  <tr>
+			    <td>&nbsp;</td>
+			    <td>&nbsp;</td>
+			    <td style="padding-left:20px"><span class="text_right">
+			      <input type="submit" value="Save"/>
+			      &nbsp;&nbsp;
+			      <input type="reset" value="Reset"/>
+			    </span></td>
+			    <td>&nbsp;</td>
+		      </tr>
+		  </table>
+		</form>
+	</div>
+</div>	
+{% endblock %}

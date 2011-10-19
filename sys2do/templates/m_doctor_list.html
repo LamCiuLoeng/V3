@@ -1,0 +1,41 @@
+{% extends "master.html" %}
+
+{% set current_tab = "t5" %}
+
+{% block content %}
+<div class="grey_box">
+	<div class="yellow_box height_600">
+		<p class="text_right"><a class="add_a" href="/m_doctor_update?action_type=n">Add New Doctor</a></p>
+		
+		<table class="datalist" width="100%">
+		<thead>
+			<tr>
+		     	<th scope="col">Doctor Name</th>
+		     	<th scope="col">Belong to Clinic</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for c in paginate_docotrs.items%}
+				{% set info = c.populate() %}
+			<tr>
+		        <th scope="row"><a href="/m_doctor_update?id={{c.id}}&action_type=m"><b>{{info['name']}}</b></a></th>
+		        <td>
+		        	{% for cid in c.clinic %}
+		        		{{cid|getByID("Clinic","name")}}&nbsp;
+		        	{% endfor %}
+		        </td>
+			</tr>
+			{% endfor %}
+		</tbody>
+		</table>
+		
+		<div class="pagescontainer">
+		   {{paginate_docotrs.pager('$link_first $link_previous ~3~ $link_next $link_last',curpage_attr={'class': 'current'},
+		   	              symbol_first='First',symbol_last='Last',symbol_previous='Pre', symbol_next='Next'
+		   )}}
+		</div>
+	</div>
+</div>
+
+		
+{% endblock %}

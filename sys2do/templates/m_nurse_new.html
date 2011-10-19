@@ -1,0 +1,79 @@
+{% extends "master.html" %}
+
+{% set current_tab = "t6" %}
+
+{% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+			
+		$("form").submit(function(){
+			var msg = [];
+			if(!$("#email").val()){
+				msg.push("Please fill in the doctor's' email! It would be the login name for the user !");
+			}
+			if(!$("#password").val()){
+				msg.push("Please fill in the password!");
+			}
+			if(!$("#repassword").val()){
+				msg.push("Please fill in the confirmed password!");
+			}
+			if($("#password").val()!=$("#repassword").val()){
+				msg.push("The password is not the same with the confirmed password");
+			}
+			if(!$("#first_name").val()){
+				msg.push("Please fill in the first name !");
+			}
+			if(!$("#last_name").val()){
+				msg.push("Please fill in the last name !");
+			}
+			
+			
+			if(msg.length>0){
+				var content = "";
+				for(var i=0;i<msg.length;i++){
+					content += "<li>" + msg[i] + "</li>";
+				}
+				$.pnotify({
+					    pnotify_text: '<div class="error"><ul>'+content+'</ul></div>',
+					    pnotify_nonblock: true,
+					    pnotify_mouse_reset: false
+					});
+				return false;			
+			}
+		});
+		
+	});
+//]]>
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="grey_box">
+	<div class="yellow_box">
+		<form action="/m_nurse_save" method="post" enctype="multipart/form-data" class="baseform">
+			<input type="hidden" name="action_type" value="NEW"/>
+		
+				<p><label for="email" class="label">E-mail</label><input type="text" name="email" id="email" class="field"/></p>
+				<p><label for="password" class="label">Password</label><input type="password" name="password" id="password" class="field"/></p>
+				<p><label for="repassword" class="label">Confirmed Password</label><input type="password" name="repassword" id="repassword" class="field"/></p>
+				<p><label for="first_name" class="label">First Name</label><input type="text" name="first_name" id="first_name" class="field"/></p>
+				<p><label for="last_name" class="label">Last Name</label><input type="text" name="last_name" id="last_name" class="field"/></p>
+				<p><label for="phone" class="label">Phone</label><input type="text" name="phone" id="phone" class="field"/></p>
+				<p><label for="image_url" class="label">Image</label><input type="file" name="image_url" class="field"/></p>
+				<p>
+					<label for="clinic" class="label">Belong to Clinic</label>
+					<select name="clinic" multiple="true" class="field">
+						{% for c in clinics %}
+							<option value="{{c.id}}">{{c.name}}</option>
+						{% endfor %}
+					</select>
+				</p>	
+				<p><label for="desc" class="label">Description</label><textarea name="desc" id="desc" class="field"></textarea></p>	
+		
+			<p class="text_right"><input type="submit" value="Save"/>&nbsp;&nbsp;<input type="reset" value="Reset"/></p>
+		</form>
+	</div>
+</div>
+		
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends "master.html" %}
+
+{%set profile = doctor.getUserProfile() %}
+
+{% block extCSS %}
+<style type="text/css">
+	.time_span{
+		border : 1px solid #CCCCCC;
+		margin-top : 5px;
+	}
+	
+	.booked_u{
+		font-size:10px;
+		margin-left:5px;
+	}
+</style>
+{% endblock %}
+
+
+{% block extJS %}
+<script src="{{url_for('.static', filename='js/custom/util.js')}}" type="text/javascript"></script>
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+
+	$(document).ready(function(){
+		$(".cal_enable").hover(
+			function (){
+    			$(this).addClass("cal_box_selected");
+			},
+			function(){
+				$(this).removeClass("cal_box_selected");
+			}
+		);
+		
+		var current_div = null;
+		$(".cal_enable").click(function(){
+			current_div = $(this);		
+					
+			$.getJSON(
+				"/get_date_info",
+				{
+					"pdate" : $("input[name='date']",current_div).val(),
+					"pdoctor" : {{doctor.id}}
+				},
+				function(r){
+					if(!r.success){
+						$.pnotify({
+						    pnotify_title: "Warning",
+						    pnotify_text: r.message,
+						    pnotify_nonblock: true,
+						    pnotify_mouse_reset: false,
+							notify_mouse_reset: false,
+						    pnotify_opacity: .8,
+							pnotify_animation: 'show'
+						});
+					}else{
+						$("#time_spans").html("");
+						for(t in r.time_spans){
+							var time_span = r.time_spans[t];
+							var html = '<div class="time_span"><input type="radio" name="time" value="'+ time_span[0]+'" /><span>'+ ampm(time_span[0]) + ' ~ ' + ampm(time_span[1]) +'</span>';
+							
+							for(var i=0;i<time_span[3];i++){
+								html += '<img class="occupied" src="/static/images/jquery_rate/yz2.jpg">';
+							}
+							
+							for(var i=0;i<time_span[2] - time_span[3];i++){
+								html += '<img class="available" src="/static/images/jquery_rate/yz1.jpg">';
+							}
+							
+							html += '</div>';
+							$("#time_spans").append(html);
+						}
+								
+							$("#dialog-form").dialog({
+								width : 500,
+								//height : 350,
+							    modal : true,
+								close: function(event, ui){ $("#remark").val("") },
+								buttons:{
+									Save : function(){
+										var div = current_div;
+										var date = $("input[name='date']",div).val();
+										
+										if($(".available").length < 1){
+											alert('The schedule for the doctor this day is full.');
+											return;
+										}
+										
+										$.getJSON("/save_events",
+											{
+												"did" : {{doctor.id}},
+												"uid" : {{session['user_profile']['id']}},
+												"d"   : date,
+												"t"   : $("#time_spans :checked").val(),
+												"remark" : $("#remark").val()
+											},
+											function(r){
+												$("#dialog-form").dialog( "close" );
+												if(r.success){
+													div.addClass("cal_booked");
+													div.removeClass("cal_enable");
+													div.unbind("click");
+													div.unbind("mouseover");
+													div.append('<br /><u class="booked_u">booked at '+ r.event_time +'</u>');
+													$.pnotify({
+													    pnotify_title: "Notice",
+													    pnotify_text: 'Your request has submit successfully!',
+													    pnotify_nonblock: true,
+													    pnotify_mouse_reset: false,
+													    pnotify_opacity: .8,
+														pnotify_animation: 'show'
+													});
+												}else{
+													$.pnotify({
+													    pnotify_title: "Warning",
+													    pnotify_text: 'The service is not avaiable now ,please try it later !',
+													    pnotify_nonblock: true,
+													    pnotify_mouse_reset: false,
+														notify_mouse_reset: false,
+													    pnotify_opacity: .8,
+														pnotify_animation: 'show'
+													});
+												}
+										});
+									},
+									Cancel: function() {
+										$(this).dialog( "close" );
+									}
+								}
+							});
+						
+					}
+				}
+			);			
+		});
+
+	});
+//]]>
+</script>
+{% endblock %}
+
+{% block content %}
+		<div class="grey_box">
+			<div class="yellow_box">
+				<div class="quarter first vpad_10 text_center">
+					<h2>{{profile}}醫生</h2>
+					{% if not profile.image_url%}
+						<img src="/static/images/no_images.jpg"/>
+					{% else %}
+						<img src="{{profile.getImage().url}}"/>
+					{% endif %}
+					{% if doctor.desc %}
+						<p>{{doctor.desc}}</p>
+					{% endif %}
+				</div>
+			
+			
+				<div class="vpad_10">
+					<h2 class="text_center">{{current.strftime('%Y.%m')}}</h2>
+					<div style="overflow: auto; width: 650px;" class="cal_first">
+						{% for h in ['MON','TUE','WED','THU','FRI','SAT','SUN'] %}
+								<div class="cal_header text_center "><b>{{h}}</b></div>
+						{% endfor %}
+						
+						{% for d in schedule %}
+							{% set div_id = "div_%s" %d['date'].strftime("%Y%m%d") %}
+							
+							{% if not d['this_month'] %}
+								<div class="cal_box cal_not_this_month" id="{{div_id}}">{{d['date'].day}}</div>
+							{% else %}
+								{% if not d['avaiable'] %}
+									<div class="cal_box cal_disable" id="{{div_id}}">{{d['date'].day}}</div>
+								{% elif d['is_booked'] %}
+									<div class="cal_box cal_booked" id="{{div_id}}">
+										{{d['date'].day}}
+										<br />
+										<u class="booked_u">booked at {{d['event_time']|ampm}}</u>
+									</div>
+								{% else%}
+									<div class="cal_box cal_enable" id="{{div_id}}">
+										{{d['date'].day}}
+										<input type="hidden" name="date" value="{{d['date'].strftime('%Y%m%d')}}"/>
+										<input type="hidden" name="booked" value="{{d['events']|length}}"/>
+									</div>
+								{% endif %}
+							{% endif %}
+						{% endfor %}
+					</div>
+					<div class="clear"><br /></div>
+					<div class="pagescontainer">
+						<a href="/schedule?id={{doctor.id}}&y={{pre.year}}&m={{pre.month}}">Previously Month</a>&nbsp;&nbsp;<a href="/schedule?id={{doctor.id}}&y={{next.year}}&m={{next.month}}">Next Month</a>
+					</div>
+				</div>
+				
+				<p><a class="back_a" href="{{request.referrer}}">Back to the clinic</a></p>
+			</div>
+		</div>
+		
+		<div id="dialog-form" title="Create New Booking Request" style="display:none">
+			<div id="time_spans"></div>
+			<div>
+				<label>Remark</label><br />
+				<textarea name="remark" id="remark" style="width:300px;height:70px;"></textarea>
+			</div>
+		</div>
+{% endblock %}

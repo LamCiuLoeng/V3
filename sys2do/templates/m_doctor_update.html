@@ -1,0 +1,211 @@
+{% extends "master.html" %}
+
+{% set current_tab = "t5" %}
+
+{% block extCSS %}
+<style type="text/css">
+/* css for timepicker */
+.ui-timepicker-div .ui-widget-header{ margin-bottom: 8px; }
+.ui-timepicker-div dl{ text-align: left; }
+.ui-timepicker-div dl dt{ height: 25px; }
+.ui-timepicker-div dl dd{ margin: -25px 0 10px 65px; }
+.ui-timepicker-div td { font-size: 90%; }
+.day-box{
+	border : 1px solid grey;
+	margin-left : 20px;
+	padding : 5px;
+}
+</style>
+{% endblock %}
+
+
+{% block extJS %}
+
+<script src="{{url_for('.static', filename='js/jquery-ui-timepicker-addon.js')}}" type="text/javascript"></script>
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	function addTime(obj,d){
+		var from = $("#from_"+d).val();
+		var to = $("#to_"+d).val();
+		
+		if(!from || !to || from>to){
+			alert("Please input the correct time(From,To).");
+			return false;
+		}
+		
+		var html = '<li><div style="display:inline;margin-right:10px;" class="time_span">';
+		html += '<span>' + from + ' - ' + to + '</span>|<a href="#" onclick="removeTime(this)">X</a>';
+		html += '<input type="hidden" name="time_' + d + '" value="' + from + '|' + to +  '"/></div></li>'; 
+		
+		$("#ul_"+d).append(html);
+	}
+	
+	function removeTime(obj){
+		var t = $(obj);
+		$(t.parents("li")[0]).remove();
+	}
+	
+	$(document).ready(function(){
+		
+		$(".time").timepicker({
+			timeOnlyTitle: 'Working Time',
+			stepMinute : 30
+		});
+		
+		
+		$("form").submit(function(){
+			var msg = [];
+			if(!$("#email").val()){
+				msg.push("Please fill in the doctor's' email! It would be the login name for the user !");
+			}
+			/*
+			if(!$("#password").val()){
+				msg.push("Please fill in the password!");
+			}
+			if(!$("#repassword").val()){
+				msg.push("Please fill in the confirmed password!");
+			}
+			if($("#password").val()!=$("#repassword").val()){
+				msg.push("The password is not the same with the confirmed password");
+			}
+			*/
+			if(!$("#first_name").val()){
+				msg.push("Please fill in the first name !");
+			}
+			if(!$("#last_name").val()){
+				msg.push("Please fill in the last name !");
+			}
+			
+			
+			if(msg.length>0){
+				var content = "";
+				for(var i=0;i<msg.length;i++){
+					content += "<li>" + msg[i] + "</li>";
+				}
+				$.pnotify({
+					    pnotify_text: '<div class="error"><ul>'+content+'</ul></div>',
+					    pnotify_nonblock: true,
+					    pnotify_mouse_reset: false
+					});
+				return false;			
+			}
+		});
+		
+	});
+//]]>
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="grey_box">
+	<div class="yellow_box">
+		<form action="/m_doctor_save" method="post" enctype="multipart/form-data" class="baseform">
+			<input type="hidden" name="action_type" value="UPDATE"/>
+			<input type="hidden" name="id" value="{{doctor.id}}"/>
+			{% set info = doctor.populate() %}
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			  <tr>
+			    <td width="150" align="right" class="input_left_title"><label for="email" class="label">E-mail</label></td>
+			    <td><input type="text" name="email" id="email" value="{{info['email']}}" class="field"/></td>
+		      </tr>
+			  <tr>
+			    <td align="right" class="input_left_title"><label for="first_name" class="label">First Name</label></td>
+			    <td><input type="text" name="first_name" id="first_name" value="{{info['first_name']}}" class="field"/></td>
+		      </tr>
+			  <tr>
+			    <td align="right" class="input_left_title"><label for="last_name" class="label">Last Name</label></td>
+			    <td><input type="text" name="last_name" id="last_name" value="{{info['last_name']}}" class="field"/></td>
+		      </tr>
+			  <tr>
+			    <td align="right" class="input_left_title"><label for="phone" class="label">Phone</label></td>
+			    <td><input type="text" name="phone" id="phone" value="{{info['phone']}}" class="field"/></td>
+		      </tr>
+			  <tr>
+			    <td align="right" class="input_left_title"><label for="image_url" class="label">Image</label></td>
+			    <td><input type="file" name="image_url" class="field"/></td>
+		      </tr>
+			  <tr>
+			    <td align="right" class="input_left_title"><label for="clinic" class="label">Belong to Clinic</label></td>
+			    <td><select name="clinic" multiple="multiple" class="field">
+			      
+		
+						{% for c in clinics %}
+							{%if c.id in doctor.clinic %}
+								
+			      <option value="{{c.id}}" selected="selected">{{c.name}}</option>
+			      
+							{% else %}
+								
+			      <option value="{{c.id}}">{{c.name}}</option>
+			      
+							{% endif%}
+						{% endfor %}
+					
+		        </select></td>
+		      </tr>
+			  <tr>
+			    <td align="right" class="input_left_title"><label class="label">Avaiable Days</label></td>
+			    <td>
+			    	<div>
+						{%for day in ["MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY","HOLIDAY"]%}
+							<fieldset class="day-box">
+								<legend>{{day}}</legend>
+								<label for="from_{{day}}">From</label><input type="text" name="from_{{day}}" class="time" id="from_{{day}}"/>
+								<label for="to_{{day}}">To</label><input type="text" name="to_{{day}}" class="time" id="to_{{day}}"/>
+								<input type="button" value="+" ref="{{day}}" onclick="addTime(this,'{{day}}')"/>
+								
+								<ul id="ul_{{day}}">
+									{%for (begin_time,end_time) in info['worktime_setting'][day]%}
+										<li>
+											<div style="display:inline;margin-right:10px;" class="time_span">
+												<span>{{begin_time}} - {{end_time}}</span>|<a href="#" onclick="removeTime(this)">X</a>
+												<input type="hidden" name="time_{{day}}" value="{{'|'.join([begin_time,end_time])}}"/>
+											</div>
+										</li>
+									{%endfor%}
+								</ul>
+		
+							</fieldset>
+							<br />
+						{%endfor%}
+					</div>
+			    </td>
+		      </tr>
+		
+			  <tr>
+			    <td align="right" class="input_left_title"><label for="category" class="label">Category</label></td>
+			    <td><select name="category" multiple="multiple" class="field">
+			      
+				  
+						{% for c in categories%}
+							{% if c.id in doctor.category %}
+								
+			      <option value="{{c.id}}" selected="selected">{{c.name}}</option>
+			      
+							{% else %}
+								
+			      <option value="{{c.id}}">{{c.name}}</option>
+			      
+							{% endif %}
+						{% endfor %}
+					
+		        </select></td>
+		      </tr>
+			  <tr>
+			    <td align="right" class="input_left_title"><label for="desc" class="label">Description</label></td>
+			    <td><textarea name="desc" id="desc" class="field">{{doctor.desc}}</textarea></td>
+		      </tr>
+			  <tr>
+			    <td align="right" class="input_left_title">&nbsp;</td>
+			    <td style="padding-left:20px"><span class="text_right">
+			      <input type="submit" value="Save"/>
+			      &nbsp;&nbsp;
+			      <input type="reset" value="Reset"/>
+			    </span></td>
+		      </tr>
+		  </table>
+		</form>
+	</div>
+</div>
+		
+{% endblock %}

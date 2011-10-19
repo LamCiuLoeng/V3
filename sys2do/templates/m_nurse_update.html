@@ -1,0 +1,83 @@
+{% extends "master.html" %}
+
+{% set current_tab = "t6" %}
+
+{% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+			
+		$("form").submit(function(){
+			var msg = [];
+			if(!$("#email").val()){
+				msg.push("Please fill in the nurse's' email! It would be the login name for the user !");
+			}
+			/*
+			if(!$("#password").val()){
+				msg.push("Please fill in the password!");
+			}
+			if(!$("#repassword").val()){
+				msg.push("Please fill in the confirmed password!");
+			}
+			if($("#password").val()!=$("#repassword").val()){
+				msg.push("The password is not the same with the confirmed password");
+			}
+			*/
+			if(!$("#first_name").val()){
+				msg.push("Please fill in the first name !");
+			}
+			if(!$("#last_name").val()){
+				msg.push("Please fill in the last name !");
+			}
+			
+			
+			if(msg.length>0){
+				var content = "";
+				for(var i=0;i<msg.length;i++){
+					content += "<li>" + msg[i] + "</li>";
+				}
+				$.pnotify({
+					    pnotify_text: '<div class="error"><ul>'+content+'</ul></div>',
+					    pnotify_nonblock: true,
+					    pnotify_mouse_reset: false
+					});
+				return false;			
+			}
+		});
+		
+	});
+//]]>
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="grey_box">
+	<div class="yellow_box">
+		<form action="/m_nurse_save" method="post" enctype="multipart/form-data" class="baseform">
+			<input type="hidden" name="action_type" value="UPDATE"/>
+			<input type="hidden" name="id" value="{{nurse.id}}"/>
+			{% set profile = nurse.getUserProfile() %}
+				<p><label for="email" class="label">E-mail</label><input type="text" name="email" id="email" value="{{profile.email}}" class="field"/></p>
+				<p><label for="first_name" class="label">First Name</label><input type="text" name="first_name" id="first_name" value="{{profile.first_name}}" class="field"/></p>
+				<p><label for="last_name" class="label">Last Name</label><input type="text" name="last_name" id="last_name" value="{{profile.last_name}}" class="field"/></p>
+				<p><label for="phone" class="label">Phone</label><input type="text" name="phone" id="phone" value="{{profile.phone}}" class="field"/></p>
+				<p><label for="image_url" class="label">Image</label><input type="file" name="image_url" class="field"/></p>
+				<p>
+					<label for="clinic" class="label">Belong to Clinic</label>
+					<select name="clinic" multiple="true" class="field">
+						{% for c in clinics %}
+							{%if c.id in nurse.clinic %}
+								<option value="{{c.id}}" selected="true">{{c.name}}</option>
+							{% else %}
+								<option value="{{c.id}}">{{c.name}}</option>
+							{% endif%}
+						{% endfor %}
+					</select>
+				</p>	
+				<p><label for="desc" class="label">Description</label><textarea name="desc" id="desc" class="field">{{nurse.desc}}</textarea></p>	
+		
+			<p class="text_right"><input type="submit" value="Save"/>&nbsp;&nbsp;<input type="reset" value="Reset"/></p>
+		</form>
+	</div>
+</div>	
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "master.html" %}
+
+{% set current_tab = "t8" %}
+
+{% block content %}
+
+<div class="grey_box">
+	<div class="yellow_box height_600">
+		<table class="datalist" width="100%">
+		<thead>
+			<tr>
+		     	<th scope="col">User Name</th>
+		     	<th scope="col">Doctor</th>
+		     	<th scope="col">Booking Date</th>
+		     	<th scope="col">Create Time</th>
+		     	<th scope="col">Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for e in paginate_events.items%}
+			<tr>
+		        <th scope="row"><a href="/m_events_update?id={{e.id}}&action_type=m"><b>{{e.uid|getByID("User","name")}}</b></a></th>
+		        <td>{{e.did|getByID("DoctorProfile","getUserProfile")}}</td>
+		        <td>{{e.date|string2Date}}</td>
+		        <td>{{e.create_time|formatTime}}</td>
+		        <td>{{e.showStatus()}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+		</table>
+		
+		<div class="pagescontainer">
+		   {{paginate_events.pager('$link_first $link_previous ~3~ $link_next $link_last',curpage_attr={'class': 'current'},
+		   	              symbol_first='First',symbol_last='Last',symbol_previous='Pre', symbol_next='Next'
+		   )}}
+		</div>
+	</div>
+</div>
+		
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "master.html" %}
+
+{% set current_tab = "t2" %}
+
+{% block content %}
+
+<div class="grey_box">
+	<div class="yellow_box height_600">
+		<table class="datalist" width="100%">
+		<thead>
+			<tr>
+		     	<th scope="col">Booking Time</th>
+		     	<th scope="col">Doctor</th>
+		     	<th scope="col">Comment</th>
+		     	<th scope="col">Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for e in events.items%}
+			<tr>
+		        <th scope="row">{{e.date|string2Date}} {{e.time}}</th>
+		        <td>{{e.did|getByID("DoctorProfile","name")}}醫生</td>
+		        <td>{{e.remark}}</td>
+		        <td>{{e.showStatus()}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+		</table>
+		
+		<div class="pagescontainer">
+		   {{events.pager('$link_first $link_previous ~3~ $link_next $link_last',curpage_attr={'class': 'current'},
+		   	              symbol_first='First',symbol_last='Last',symbol_previous='Pre', symbol_next='Next'
+		   )}}
+		</div>
+	</div>
+</div>
+
+		
+{% endblock %}

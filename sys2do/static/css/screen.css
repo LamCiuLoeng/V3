@@ -1,0 +1,248 @@
+body{
+	/*
+	background-color: #152652;
+    background-image: url("/static/images/login_01.jpg");
+    background-repeat: repeat-x;
+    */
+    margin: 0;
+    background-image: url("/static/images/bg.jpg");
+    background-repeat : repeat-x;
+}	
+.outter{
+	background-color: #fff;
+	overflow : auto;
+	margin-top : 7px !important;
+	margin-bottom : 0px !important;
+	/*
+	border : 1px solid gray;
+	*/
+}
+
+.height_700{
+	height: auto !important;
+	min-height : 700px;
+	height:700px;
+}
+
+.height_600{
+	height: auto !important;
+	min-height : 600px;
+	height:600px;
+}
+
+.height_500{
+	height: auto !important;
+	min-height : 500px;
+	height:500px;
+}
+
+.height_400{
+	height: auto !important;
+	min-height : 400px;
+	height:400px;
+}
+/*--------------------jerry.yu----------------------*/
+/*- Form --------------------------- */
+.baseform{
+			
+}
+.baseform .label{
+	margin-left:20px;
+	width : 150px;
+	float : left;
+	background-color :#FFC;
+	color : #369;
+	font-weight : blod;
+	padding : 3px;
+}
+.baseform .field{
+	width : 300px;
+	margin-left : 20px;
+	
+}
+
+#header{
+	margin:0px;
+	width:960px;
+	height:200px;
+	background-image:url(/static/images/header_bg.jpg);
+}
+
+#welcome_div{
+	display:inline;
+	margin-right:100px;
+	text-align:center;
+	/*background:#0787A4;*/
+	width:300px;
+	float:right;
+	height:30px;
+	border-radius : 0px 0px 10px 10px;
+	background-image:url(/static/images/welcome_bg.jpg);
+	background-repeat : no-repeat;
+}
+
+#main_content{
+	background-color:#173152;
+	margin:20px 0px 0px 0px;
+	width:960px;
+	background-image:url(/static/images/main_bg.jpg);
+	background-repeat:repeat-x;
+	border-radius : 20px 20px 0px 0px;
+}
+
+#footer{
+	background:#173152;
+	margin:0px;
+	width:960px;
+	text-align:center;
+}
+
+
+/*- Menu Tabs--------------------------- */
+#menu{
+	display:inline;
+	margin-right : 50px;
+	float : right;
+	width : 800px;
+	text-align : right;
+}
+#menu a{
+	font-family : Arial,Helvetica,sans-serif;
+	font-size : 14px;
+	font-weight : bold;
+	padding : 0px 4px 0px 4px;
+	color : #034D6F;
+}
+
+#menu a:hover{
+	color:#690;
+}
+
+#search_div{
+	margin : auto;
+	width : 250px;
+	margin-top : 50px;
+}
+
+/*
+.clinic_div{
+	background-color:#FFC;
+}
+*/
+
+.input_left_title{
+	text-align:right;
+	padding:10px 20px 10px 0px;
+	background-color:#069;
+	font-size:12px;
+	font-family:"Arial Black", Gadget, sans-serif;
+	color:#fff;
+}
+a.login_top:link{
+	color:#FF6;
+}
+a.login_top:visited{
+	color:#FF6;
+}
+a.login_top:hover{
+	color:#0FF;
+}
+a.login_top:active{
+	color:#0FF;
+}
+/*--------------------jerry.yu----------------------*/
+
+
+
+
+/*- calendar --------------------------- */
+.cal_header{
+	width:90px;
+	height:90px;
+	float:left;
+	margin:0px;
+	padding:0px;
+	background-color:yellow;
+	border-bottom:1px solid #369;
+	border-right:1px solid #369;
+	border-top:1px solid #369;
+}
+.cal_box{
+	width:90px;
+	height:90px;
+	float:left;
+	margin:0px;
+	padding:0px;
+	border-bottom:1px solid #369;
+	border-right:1px solid #369;
+}
+
+.cal_first{
+	border-left:1px solid #369;
+}
+
+.cal_disable{
+	background-color:red;
+}
+.cal_enable{
+	background-color:#adff2f;
+}
+.cal_booked{
+	background-color:#b0c4de;
+}
+.cal_not_this_month{
+	background-color:#ddd;
+}
+.cal_box_selected{
+	background-color:#7e9ec7;
+}
+.cal_box_booked{
+	background-color:brown;
+}
+
+
+.btn{
+	background-color : #FFFBC1;
+	color : #61A7CB;
+	font-weight : bold;
+	font-size : 15px;
+	border : 1px solid;
+	padding : 3px;
+	margin-left : 10px;
+	font-weight : Arial,Helvetica,sans-serif;
+}
+
+.next_a{
+	background-image : url('/static/images/next.png');
+	background-repeat : no-repeat;
+	padding-left : 18px;
+	font-weight : bold;
+	font-size : 16px;
+}
+
+.back_a{
+	background-image : url('/static/images/back.png');
+	background-repeat : no-repeat;
+	padding-left : 18px;
+	font-weight : bold;
+	font-size : 16px;
+}
+
+.add_a{
+	background-image : url('/static/images/add.png');
+	background-repeat : no-repeat;
+	padding-left : 18px;
+	font-weight : bold;
+	font-size : 16px;
+}
+
+.grey_box{
+	padding:10px;
+	background-color:#aaa;
+}
+
+.yellow_box{
+	padding:10px;
+	background-color : #FFFFCC;
+}
+

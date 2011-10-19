@@ -1,0 +1,20 @@
+{% extends "master.html" %}
+
+
+{% block content %}
+<form action="/save_profile" method="post" enctype="multipart/form-data" class="baseform">
+	{% if user.image_url %}
+		<p><a href="/thumbnail"><img src="{{user.getImage().url}}"/></a></p>
+	{% else %}
+		<p><a href="/thumbnail"><img src="/static/images/no_images.jpg"/></a></p>
+	{% endif %}
+	<p><a href="/change_password">Change Password</a></p>
+	<p><label for="email" class="label">E-mail</label><span class="field">{{user.email}}</span></p>
+	<p><label for="first_name" class="label">First Name</label><input type="text" name="first_name" id="first_name" value="{{user.first_name}}" class="field"/></p>
+	<p><label for="last_name" class="label">Last Name</label><input type="text" name="last_name" id="last_name" value="{{user.last_name}}" class="field"/></p>
+	<p><label for="phone" class="label">Phone</label><input type="text" name="phone" id="phone" value="{{user.phone|ifFalse}}" class="field"/></p>
+	<p><label for="birthday" class="label">Birthday</label><input type="text" name="birthday" id="birthday" value="{{user.birthday|ifFalse}}" class="field"/></p>
+	<p><label for="image_url" class="label">Image</label><input type="file" name="image_url" id="image_url" class="field"/></p>
+	<p><input type="submit" value="Save"/>&nbsp;&nbsp;<input type="reset" value="Reset"/></p>
+</form>
+{% endblock %}

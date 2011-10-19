@@ -1,0 +1,28 @@
+{% extends "master.html" %}
+
+
+{% block content %}
+<div id="main_content" class="full">
+	<div class="fivesixth last top_margin_20 blackborder_dotted vpad_10">
+		<div>
+			{% if not d['image_url'] %}
+				<img src="/static/images/no_images.jpg" class="obj_left" style="margin:10px;"/>
+			{% else %}
+				<img src="{{d['image_url']}}" class="obj_left" style="margin:10px;"/>
+			{% endif %}
+			
+			<div></div>
+		</div>
+		<p></p>
+	</div>
+	{% for d in doctors %}
+		<div class="fivesixth last top_margin_20 blackborder_dotted vpad_10">
+			<img src="{{d['image_url']}}" class="obj_left" style="margin:10px;"/>
+			<h3>{{d['name']}}</h3>
+			<p>{{d['desc']}}</p>
+			<p><a href="/schedule?id={{d['id']}}">Check the doctor's schedule</a></p>
+		</div>
+	{% endfor %}
+</div>
+		
+{% endblock %}

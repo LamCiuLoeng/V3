@@ -1,0 +1,38 @@
+{% extends "master.html" %}
+
+{% set current_tab = "t3" %}
+
+{% block content %}
+<div class="grey_box">
+	<div class="yellow_box height_600">
+		<table class="datalist" width="100%">
+		<thead>
+			<tr>
+		     	<th scope="col">Subject</th>
+		     	<th scope="col">Time</th>
+		     	<th scope="col">Type</th>
+		     	<th scope="col">Content</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for m in messages.items%}
+			<tr>
+		        <th scope="row">{{m.subject}}</td>
+		        <td>{{m.time|formatTime}}</th>
+		        <td>{{m.type}}</td>
+		        <td>{{m.content}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+		</table>
+		
+		<div class="pagescontainer">
+		   {{messages.pager('$link_first $link_previous ~3~ $link_next $link_last',curpage_attr={'class': 'current'},
+		   	              symbol_first='First',symbol_last='Last',symbol_previous='Pre', symbol_next='Next'
+		   )}}
+		</div>
+	</div>
+</div>
+
+		
+{% endblock %}

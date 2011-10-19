@@ -1,0 +1,59 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+		{% for c in clinics %}
+			var map_{{c.id}} =new google.maps.Map($("#gmap_div_{{c.id}}")[0],{
+				zoom : 13,
+				mapTypeId:google.maps.MapTypeId.ROADMAP,
+				minZoom:10,
+                maxZoom:18
+			})
+			{% if c.location[0] and c.location[1]%}
+				var marker_{{c.id}} = new google.maps.Marker({
+			        position: new google.maps.LatLng({{c.location[0]}},{{c.location[1]}}),
+			        title: "{{c.name}}",
+			        map:map_{{c.id}}
+			      });
+			    map_{{c.id}}.setCenter(marker_{{c.id}}.getPosition());
+		    {% else %}
+		    	map_{{c.id}}.setCenter(new google.maps.LatLng(22.296428, 114.0094970));
+		    {% endif %}
+		{% endfor %}
+	});
+//]]>
+</script>
+{% endblock %}
+
+{% block content %}
+
+	{% for c in clinics.items %}
+		<div class="bottom_margin_20 blackborder grey_box">
+			<div class="yellow_box">
+				<h4>{{c.name}}</h4>
+				<div>
+		        	<img src="/static/images/zstp.jpg" width="300px" class="obj_left" height="200px" style="margin-right:15px; border:#000 solid 1px"  />
+					<div id="gmap_div_{{c.id}}" class="obj_left blackborder right_margin_10" style="width:300px;height:200px;"></div>
+				</div>
+				<div class="clear"><br /></div>
+				{% if c.desc %}
+					<p>{{c.desc}}</p>
+				{% endif %}
+				<p class="text_right"><a class="next_a" href="/list_doctors_by_clinic?id={{c.id}}">Check the doctors</a></p>
+			</div>
+		</div>
+	{% endfor %}
+
+
+
+<div class="pagescontainer">
+   {{clinics.pager('$link_first $link_previous ~3~ $link_next $link_last',curpage_attr={'class': 'current'},
+   	              symbol_first='First',symbol_last='Last',symbol_previous='Pre', symbol_next='Next'
+   )}}
+</div>
+
+		
+{% endblock %}

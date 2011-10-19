@@ -1,0 +1,142 @@
+{% extends "master.html" %}
+
+{% set current_tab = "t8" %}
+
+{% block extJS %}
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+		
+	});  
+	
+	function toConfirm(obj){
+		var btn = $(obj);
+		$("#dialog-form").dialog({
+			width : 400,
+			modal : true,
+			close: function(event, ui){ $("#remark").val("") },
+			buttons:{
+				Save : function(){
+					$.getJSON("/m_events_update",
+						{
+							"id"     : $("#event_id").val(),
+							"action_type" : "p",
+							"remark" : $("#remark").val()
+						},
+						function(r){
+							$("#dialog-form").dialog( "close" );
+							if(r.success){
+								$.pnotify({
+									    pnotify_title: "Notice",
+									    pnotify_text: 'Mark as confirmed successfully!',
+									    pnotify_nonblock: true,
+									    pnotify_mouse_reset: false,
+									    pnotify_opacity: .8,
+										pnotify_animation: 'show'
+									});
+								btn.remove();
+								$("#status").text("CONFIRMED");
+							}else{
+								$.pnotify({
+									    pnotify_title: "Warning",
+									    pnotify_text: 'The service is not avaiable now ,please try it later !',
+									    pnotify_nonblock: true,
+									    pnotify_mouse_reset: false,
+										notify_mouse_reset: false,
+									    pnotify_opacity: .8,
+										pnotify_animation: 'show'
+									});
+							}
+						}
+					);
+				},
+				Cancel:function(){
+					$(this).dialog( "close" );
+				}
+			}
+		});
+	}
+	
+	function toCancel(obj){
+		var btn = $(obj);
+		$("#dialog-form").dialog({
+			width : 400,
+			modal : true,
+			close: function(event, ui){ $("#remark").val("") },
+			buttons:{
+				Save : function(){
+					$.getJSON("/m_events_update",
+						{
+							"id"     : $("#event_id").val(),
+							"action_type" : "c",
+							"remark" : $("#remark").val()
+						},
+						function(r){
+							$("#dialog-form").dialog( "close" );
+							if(r.success){
+								$.pnotify({
+									    pnotify_title: "Notice",
+									    pnotify_text: 'Cancel the booking successfully!',
+									    pnotify_nonblock: true,
+									    pnotify_mouse_reset: false,
+									    pnotify_opacity: .8,
+										pnotify_animation: 'show'
+									});
+								btn.remove();
+								$("#status").text("CANCEL");
+							}else{
+								$.pnotify({
+									    pnotify_title: "Warning",
+									    pnotify_text: 'The service is not avaiable now ,please try it later !',
+									    pnotify_nonblock: true,
+									    pnotify_mouse_reset: false,
+										notify_mouse_reset: false,
+									    pnotify_opacity: .8,
+										pnotify_animation: 'show'
+									});
+							}
+						}
+					);
+				},
+				Cancel:function(){
+					$(this).dialog( "close" );
+				}
+			}
+		});
+	}
+//]]>
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="grey_box">
+	<div class="yellow_box">
+		<div class="baseform">
+		<input type="hidden" name="event_id" id="event_id" value="{{event.id}}"/>
+		<p><label class="label">User</label><span class="field">{{event.uid|getByID("User","name")}}</span></p>
+		<p><label class="label">Doctor</label><span class="field">{{event.did|getByID("DoctorProfile","getUserProfile")}}</span></p>
+		<p><label class="label">Booking Date</label><span class="field">{{event.date|string2Date}}</span></p>
+		<p><label class="label">Booking Time</label><span class="field">{{event.time}}</span></p>
+		<p><label class="label">Create Time</label><span class="field">{{event.create_time|formatTime}}</span></p>
+		<p><label class="label">Comment</label><span class="field">{{event.remark}}</span></p>
+		<p><label class="label">Status</label><span class="field" id="status">{{event.showStatus()}}</span></p>
+		<p>
+			{%if event.status == 0 %}
+				<input type="button" value="Mark As Confirmed" onclick="toConfirm(this)"/>
+			{% endif %}
+			&nbsp;&nbsp;
+			{% if event.status != 2 %}
+				<input type="button" value="Mark As Canceled" onclick="toCancel(this)"/>
+			{%endif%}
+		</p>
+		</div>
+		
+		
+		<div id="dialog-form" style="display:none">
+			<p id="notice"></p>
+			<p id="star"></p>
+			<p><label>Remark</label><br /><textarea name="remark" id="remark" style="width:300px;height:70px;"></textarea></p>
+		</div>
+	</div>
+</div>
+{% endblock %}

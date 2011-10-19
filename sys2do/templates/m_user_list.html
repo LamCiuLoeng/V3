@@ -1,0 +1,36 @@
+{% extends "master.html" %}
+
+{% set current_tab = "t7" %}
+
+{% block content %}
+
+<div class="grey_box">
+	<div class="yellow_box height_600">
+		<table class="datalist" width="100%">
+		<thead>
+			<tr>
+		     	<th scope="col">User E-mail</th>
+		     	<th scope="col">User Name</th>
+		     	<th scope="col">Registe Time</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for c in paginate_users.items%}
+			<tr>
+		        <th scope="row"><a href="/m_user_update?id={{c.id}}&action_type=v"><b>{{c.email}}</b></a></th>
+		        <td>{{c}}</td>
+		        <td>{{c.create_time|formatTime}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+		</table>
+		
+		<div class="pagescontainer">
+		   {{paginate_users.pager('$link_first $link_previous ~3~ $link_next $link_last',curpage_attr={'class': 'current'},
+		   	              symbol_first='First',symbol_last='Last',symbol_previous='Pre', symbol_next='Next'
+		   )}}
+		</div>
+	</div>
+</div>
+		
+{% endblock %}

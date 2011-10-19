@@ -1,0 +1,62 @@
+{% extends "master.html" %}
+
+{% block extJS %}
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+			var map =new google.maps.Map($("#gmap_div")[0],{
+				zoom : 13,
+				mapTypeId:google.maps.MapTypeId.ROADMAP,
+				minZoom:10,
+                maxZoom:18
+			})
+			var marker = new google.maps.Marker({
+		        position: new google.maps.LatLng({{clinic.location[0]}},{{clinic.location[1]}}),
+		        title: "{{clinic.name}}",
+		        map:map
+		      });
+		    map.setCenter(marker.getPosition());
+	});
+//]]>
+</script>
+{% endblock %}
+
+
+
+{% block content %}
+	<div class="bottom_margin_20 blackborder vpad_10 grey_box">
+		<div class="yellow_box">
+			<h4>{{clinic.name}}</h4>
+			<div>
+				<img src="/static/images/zstp.jpg" width="300px" height="200px" class="obj_left" style="margin-right:15px; border:#000 solid 1px"  />
+				<div id="gmap_div" class="obj_left blackborder right_margin_10" style="width:300px;height:200px;"></div>
+			</div>
+			<div class="clear"><br /></div>
+			{% if clinic.desc %}
+				<p>{{clinic.desc|ifFalse}}</p>
+			{% endif %}
+			<p class="text_left"><a class="back_a" href="/list_clinic">Back to clinic list</a></p>
+		</div>		
+	</div>
+	{% for d in doctors %}
+		<div class="bottom_margin_20 blackborder vpad_10 grey_box">
+			<div class="yellow_box">
+				<h3>{{d['name']}} 醫生</h3>
+				{% set profile = d.getUserProfile() %}
+				<div>				
+				{% if not profile.image_url %}
+					<img src="/static/images/no_images.jpg" class="obj_left"/>
+				{% else %}
+					<img src="{{profile.getImage().url}}" class="obj_left"/>
+				{% endif %}
+				</div>
+				<div class="clear"><br /></div>
+				{% if d['desc']%}
+					<p>{{d['desc']}}</p>
+				{% endif %}
+				<p class="text_right"><a class="next_a" href="/schedule?id={{d.id}}">Check the doctor's schedule</a></p>
+			</div>
+		</div>
+	{% endfor %}	
+{% endblock %}

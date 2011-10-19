@@ -1,0 +1,79 @@
+{% extends "master.html" %}
+
+{% set current_tab = "t4" %}
+
+{% block extJS %}
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+
+<script language="JavaScript" type="text/javascript">
+//<![CDATA[
+	$(document).ready(function(){
+		var map =new google.maps.Map($("#gmap")[0],{
+				zoom : 12,
+				mapTypeId:google.maps.MapTypeId.ROADMAP,
+				minZoom:10,
+                maxZoom:18,
+                center: new google.maps.LatLng(22.396428, 114.0274970),  //hong kong lat and lng
+			});
+			
+		var current_marker = null;
+		google.maps.event.addListener(map, 'click', function(event) {
+		     var marker = new google.maps.Marker({
+			      position: event.latLng, 
+			      map: map
+			  });
+             if(current_marker){
+		         current_marker.setMap(null);
+             }
+             current_marker = marker;
+			 map.setCenter(event.latLng);
+             $("#lat").val(event.latLng.lat());
+			 $("#lng").val(event.latLng.lng());
+		});
+		
+		$("form").submit(function(){
+			var msg = [];
+			if(!$("#name").val()){
+				msg.push("Please fill in the clinic name !");
+			}
+			
+			if(msg.length>0){
+				var content = "";
+				for(var i=0;i<msg.length;i++){
+					content += "<li>" + msg[i] + "</li>";
+				}
+				$.pnotify({
+					    pnotify_text: '<div class="error"><ul>'+content+'</ul></div>',
+					    pnotify_nonblock: true,
+					    pnotify_mouse_reset: false
+					});
+				return false;			
+			}
+		});
+		
+	});
+//]]>
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="grey_box">
+	<div class="yellow_box height_600">
+		<form action="/m_clinic_save" method="post" enctype="multipart/form-data" class="baseform">
+			<input type="hidden" name="type" value="NEW"/>
+			<input type="hidden" name="lat" id="lat" value=""/>
+			<input type="hidden" name="lng" id="lng" value=""/>
+	
+
+			<p><label for="name" class="label">Clinic Name</label><input type="text" name="name" id="name" class="field"/></p>
+			<p><label for="website" class="label">Website</label><input type="text" name="website" id="website" class="field"/></p>
+			<p><label for="address" class="label">Address</label><textarea name="address" id="address" class="field"></textarea></p>
+			<p><label for="desc" class="label">Description</label><textarea name="desc" id="desc" class="field"></textarea></p>
+			<p><label for="image_url" class="label">Image</label><input type="file" name="image_url" class="field"/></p>
+			<p><label for="location" class="label">Location</label><div id="gmap" style="width:500px;height:300px;margin-left:200px;"></div></p>
+
+			<p class="text_right"><input type="submit" value="Save"/>&nbsp;&nbsp;<input type="reset" value="Reset"/></p>
+		</form>
+	</div>
+</div>	
+{% endblock %}
