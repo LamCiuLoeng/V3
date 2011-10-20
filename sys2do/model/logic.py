@@ -7,15 +7,17 @@
 ###########################################
 '''
 
+import datetime
 from sqlalchemy import Table, ForeignKey, Column, Date, Time
 from sqlalchemy.types import Unicode, Integer, DateTime
 from sqlalchemy.orm import relation, backref
+from sqlalchemy.sql.expression import and_
 
 from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin, User
 from sys2do.util.sa_helper import JSONColumn
 
-__all__ = ['Clinic', 'DoctorProfile', 'NurseProfile', 'Events', 'Message', 'Holiday']
+__all__ = ['Clinic', 'DoctorProfile', 'NurseProfile', 'Events', 'Message', 'Holiday', 'UploadFile']
 
 
 clinic_doctor_table = Table('clinic_doctor', metadata,
@@ -47,18 +49,31 @@ class Clinic(DeclarativeBase, SysMixin):
     district = Column(Unicode(500))
     street = Column(Unicode(500))
     location = Column(Unicode(20))
+    doctors = relation('DoctorProfile', secondary = clinic_doctor_table, backref = 'clinics')
+    nurses = relation('NurseProfile', secondary = clinic_nurse_table, backref = 'clinics')
+
+
 
 
 class DoctorProfile(DeclarativeBase, SysMixin):
     __tablename__ = 'doctor_profile'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-#    clinic_id = Column(Integer, ForeignKey('clinic.id'))
-#    clinic = relation(Clinic, backref = backref("doctors", order_by = id), primaryjoin = "and_(Clinic.id == Doctor.clinic_id, Doctor.active == 0)")
     user_id = Column(Integer)
     desc = Column(Unicode(1000))
     worktime_setting = Column(JSONColumn(5000))
 
+    def getUserProfile(self):
+        user = DBSession.query(User).get(self.user_id)
+        info = user.populate()
+        info['profile_id'] = self.id
+        info['desc'] = self.desc
+        info['worktime_setting'] = self.worktime_setting
+        return info
+
+
+    def name(self):
+        return unicode(DBSession.query(User).get(self.user_id))
 
 
 
@@ -66,8 +81,6 @@ class NurseProfile(DeclarativeBase, SysMixin):
     __tablename__ = 'nurse_profile'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-#    clinic_id = Column(Integer, ForeignKey('clinic.id'))
-#    clinic = relation(Clinic, backref = backref("nurses", order_by = id), primaryjoin = "and_(Clinic.id == Nurse.clinic_id, Nurse.active == 0)")
     user_id = Column(Integer)
     desc = Column(Unicode(1000))
 
@@ -80,13 +93,17 @@ class Events(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     user_id = Column(Integer)
     doctor_id = Column(Integer)
-    date = Column(Date)
-    time = Column(Time)
-    status = Column(Integer)
+    date = Column(Unicode(10))
+    time = Column(Unicode(10))
+    status = Column(Integer, default = 0)
     remark = Column(Unicode(1000))
 
-
-
+    def showStatus(self):
+        return {
+                0 : "NEW",
+                1 : "CONFIRMED",
+                2 : "CANCEL"
+                }[self.status]
 
 
 class Message(DeclarativeBase, SysMixin):
@@ -98,7 +115,7 @@ class Message(DeclarativeBase, SysMixin):
     subject = Column(Unicode(200))
     content = Column(Unicode(1000))
     type = Column(Unicode(20))
-    status = Column(Integer)
+    status = Column(Integer, default = 0)
 
 
 
@@ -111,3 +128,33 @@ class Holiday(DeclarativeBase, SysMixin):
     month = Column(Integer)
     day = Column(Integer)
     region = Column(Unicode(10))
+
+    @classmethod
+    def isHoliday(clz, d):
+        if isinstance(d, (str, unicode)):
+            try:
+                year, month, day = d[:10].split('-')
+                DBSession.query(clz).filter(and_(clz.year == year, clz.month == month, clz.day == day)).one()
+                return True
+            except:
+                pass
+        elif isinstance(d, (datetime.datetime, datetime.date)):
+            try:
+                DBSession.query(clz).filter(and_(clz.year == d.year, clz.month == d.month, clz.day == d.day)).one()
+                return True
+            except:
+                pass
+        return False
+
+
+
+
+class UploadFile(DeclarativeBase, SysMixin):
+    __tablename__ = 'system_upload_file'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Unicode(100))
+    name = Column(Unicode(1000))
+    url = Column(Unicode(1000))
+    remark = Column(Unicode(5000))
+

@@ -2,14 +2,15 @@
 from datetime import datetime as dt, timedelta
 import calendar, traceback
 from webhelpers.paginate import Page
-import pymongo
+#import pymongo
 from flask import g, render_template, flash, session, redirect, url_for, request
 from flask import current_app as app
 from flask.helpers import jsonify
 
-from sys2do.model import connection
+from sys2do.model import DBSession, Clinic, Group
 from sys2do.util.common import MESSAGE_INFO, MESSAGE_ERROR, _g, upload
 from sys2do.util.decorator import login_required, templated, has_all_permissions, has_any_permissions, is_all_roles, is_any_roles
+
 
 ITEM_PER_PAGE = 20
 
@@ -21,7 +22,8 @@ def m_clinic_list():
     except:
         page = 1
 
-    cs = list(connection.Clinic.find({'active':0}).sort('name'))
+#    cs = list(connection.Clinic.find({'active':0}).sort('name'))
+    cs = DBSession.query(Clinic).filter(Clinic.active == 0).order_by(Clinic.name).all()
     paginate_clinics = Page(cs, page = page, items_per_page = ITEM_PER_PAGE, url = lambda page:"%s?page=%d" % (url_for("m_clinic"), page))
     return render_template("m_clinic_list.html", paginate_clinics = paginate_clinics)
 
@@ -387,16 +389,15 @@ def m_nurse_save():
 @login_required
 @templated("m_user_list.html")
 def m_user_list():
-#    users = connection.User.find({"id":{"$in":r.users}})
-#    return {"users" : users}
-
     try:
         page = request.values.get("page", 1)
     except:
         page = 1
 
-    r = connection.Role.one({"name" : "NORMALUSER"})
-    users = list(connection.User.find({"id":{"$in":r.users}}))
+#    r = connection.Role.one({"name" : "NORMALUSER"})
+#    users = list(connection.User.find({"id":{"$in":r.users}}))
+    r = DBSession.query(Group).filter(Group.name == 'NORMALUSER').one()
+    users = r.users
     paginate_users = Page(users, page = page, items_per_page = ITEM_PER_PAGE, url = lambda page:"%s?page=%d" % (url_for("m_user_list"), page))
     return { "paginate_users" : paginate_users}
 

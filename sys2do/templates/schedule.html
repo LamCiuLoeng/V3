@@ -143,14 +143,14 @@
 		<div class="grey_box">
 			<div class="yellow_box">
 				<div class="quarter first vpad_10 text_center">
-					<h2>{{profile}}醫生</h2>
-					{% if not profile.image_url%}
+					<h2>{{profile['name']}}醫生</h2>
+					{% if not profile['image_url']%}
 						<img src="/static/images/no_images.jpg"/>
 					{% else %}
-						<img src="{{profile.getImage().url}}"/>
+						<img src=""/>
 					{% endif %}
-					{% if doctor.desc %}
-						<p>{{doctor.desc}}</p>
+					{% if doctor['desc'] %}
+						<p>{{doctor['desc']}}</p>
 					{% endif %}
 				</div>
 			

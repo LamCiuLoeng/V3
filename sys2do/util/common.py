@@ -11,7 +11,7 @@ from werkzeug import secure_filename
 from flask import current_app as app
 
 from sys2do.setting import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, UPLOAD_FOLDER_URL
-from sys2do.model import connection, UploadFile
+from sys2do.model import DBSession, UploadFile
 
 __all__ = ['MESSAGE_INFO', 'MESSAGE_ERROR', '_g', 'upload', 'makeException']
 
@@ -38,14 +38,19 @@ def upload(name):
         converted_name = "%s.%s" % (dt.now().strftime("%Y%m%d%H%M%S"), f.filename.rsplit('.', 1)[1].lower())
         path = os.path.join(UPLOAD_FOLDER, converted_name)
         f.save(path)
-        u = connection.UploadFile()
-        u.id = u.getID()
-        u.uid = session['user_profile']['id']
-        u.name = unicode(secure_filename(f.filename))
-        u.path = path
-        u.url = "/".join([UPLOAD_FOLDER_URL, converted_name])
-        u.save()
+
+        u = UploadFile(create_by_id = session['user_profile']['id'], name = secure_filename(f.filename), path = path, url = "/".join([UPLOAD_FOLDER_URL, converted_name]))
+        DBSession.add(u)
+        DBSession.flush()
         return u
+#        u = connection.UploadFile()
+#        u.id = u.getID()
+#        u.uid = session['user_profile']['id']
+#        u.name = unicode(secure_filename(f.filename))
+#        u.path = path
+#        u.url = "/".join([UPLOAD_FOLDER_URL, converted_name])
+#        u.save()
+#        return u
     else:
         raise makeException("Invalid file to upload!")
 

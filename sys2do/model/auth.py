@@ -92,9 +92,9 @@ class User(DeclarativeBase, SysMixin):
     birthday = Column(Date, default = None)
     image_url = Column(Unicode(100))
 
-    def __repr__(self): return self.email
+    def __repr__(self): return "%s %s" % (self.first_name, self.last_name)
 
-    def __unicode__(self): return self.email
+    def __unicode__(self): return "%s %s" % (self.first_name, self.last_name)
 
     @property
     def permissions(self):
@@ -120,6 +120,17 @@ class User(DeclarativeBase, SysMixin):
     @classmethod
     def identify(cls, value):
         return DBSession.query(cls).filter(cls.user_name.match(value)).one()
+
+    def populate(self):
+        return {
+                'id' : self.id,
+                'email' : self.email,
+                'first_name' : self.first_name,
+                'last_name' : self.last_name,
+                'image_url' : self.image_url,
+                'phone' : self.phone,
+                'name' : unicode(self)
+                }
 
 
 class Permission(DeclarativeBase, SysMixin):

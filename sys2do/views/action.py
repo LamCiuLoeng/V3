@@ -7,13 +7,16 @@ Created on 2011-5-4
 from datetime import datetime as dt, timedelta
 import calendar, traceback
 from webhelpers.paginate import Page
-import pymongo
+from sqlalchemy.sql.expression import and_, desc
+#import pymongo
 from flask import g, render_template, flash, session, redirect, url_for, request
 from flask import current_app as app
 from flask.helpers import jsonify
 
-from sys2do.model import connection
+from sys2do.model import DBSession, Clinic
 from sys2do.util.decorator import templated, login_required
+from sys2do.model.logic import DoctorProfile, Events, Holiday, Message
+
 
 
 @login_required
@@ -23,8 +26,8 @@ def list_clinic():
         page = request.values.get("page", 1)
     except:
         page = 1
-    cs = list(connection.Clinic.find({'active':0}).sort('name'))
-    paginate_clinics = Page(cs, page = page, items_per_page = 10, url = lambda page:"%s?page=%d" % (url_for("list_clinic"), page))
+    cs = DBSession.query(Clinic).filter(Clinic.active == 0).order_by(Clinic.name)
+    paginate_clinics = Page(cs, page = page, items_per_page = 5, url = lambda page:"%s?page=%d" % (url_for("list_clinic"), page))
     return {"clinics" :paginate_clinics}
 
 
@@ -48,10 +51,9 @@ def list_doctors_by_clinic():
         flash("No clinic supplied !")
         return redirect(url_for("index"))
     else:
-        c = connection.Clinic.one({'active':0, 'id':int(id)})
-        data = [connection.DoctorProfile.one({'id':i})for i in c.doctors]
+        c = DBSession.query(Clinic).get(id)
 
-    return render_template("list_doctors_by_clinic.html", doctors = data, clinic = c)
+    return render_template("list_doctors_by_clinic.html", doctors = c.doctors, clinic = c)
 
 
 @login_required
@@ -61,7 +63,6 @@ def schedule():
         flash("No doctor id is supplied!", "WARNING")
         return redirect("/index")
 
-    dp = connection.DoctorProfile.one({'id':int(id)})
     year = int(request.values.get("y", dt.now().year))
     month = int(request.values.get("m", dt.now().month))
     current = dt(year, month, 15)
@@ -69,10 +70,10 @@ def schedule():
     next = current + timedelta(days = 30)
     calendar.setfirstweekday(6)
 
-    es = connection.Events.find({'active':0,
-                                  'did':int(id),
-                                  'date':{'$gt':current.strftime('%Y%m'), '$lt':next.strftime('%Y%m')}
-                                  }).sort("date")
+    dp = DBSession.query(DoctorProfile).get(id)
+    es = DBSession.query(Events).filter(and_(Events.active == 0, Events.doctor_id == id,
+                                             Events.date > current.strftime('%Y%m'), Events.date < next.strftime('%Y%m'))).order_by(Events.date)
+
     events = {}
     for b in es:
         if b.date in events:
@@ -81,7 +82,6 @@ def schedule():
             events[b.date] = [b]
 
     s = []
-
     days = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]
     for d in calendar.Calendar().itermonthdates(year, month):
         info = {
@@ -99,9 +99,8 @@ def schedule():
 
         info['this_month'] = True
         info['events'] = events[d.strftime("%Y%m%d")] if d.strftime("%Y%m%d") in events else []
-
         for e in info['events']:
-            if e.uid == session['user_profile']['id']:
+            if e.user_id == session['user_profile']['id']:
                 info['is_booked'] = True
                 info['event_time'] = e.time
                 break
@@ -110,9 +109,9 @@ def schedule():
             info['avaiable'] = False
         elif d.strftime("%Y%m%d") in dp.worktime_setting["SPECIAL"]:
             info['avaiable'] = False
-        elif connection.Holiday.isHoliday(d):
-            ws = dp.worktime_setting["HOLIDAY"]
-            info['avaiable'] = len(ws) > 0
+        elif Holiday.isHoliday(d):
+            ws = dp['worktime_setting']["HOLIDAY"]
+            info['avaiable'] = len(ws['times']) > 0
             info['holiday'] = True
         else:
             ws = dp.worktime_setting[days[d.weekday()]]
@@ -123,6 +122,8 @@ def schedule():
 
 
 
+
+
 @login_required
 def get_date_info():
     pdate = request.values.get("pdate", None)
@@ -130,15 +131,12 @@ def get_date_info():
     if not pdate or not pdoctor:
         return jsonify({"success" : False, "message" : "No date or doctor supplied!"})
 
-    doctor = connection.DoctorProfile.one({"id" : int(pdoctor)})
+    doctor = DBSession.query(DoctorProfile).get(pdoctor)
     require_date = dt.strptime(pdate, "%Y%m%d")
-
     day = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"][require_date.weekday()]
     time_spans = {}
     for setting in doctor.worktime_setting[day]:
         begin, end = setting['times']
-
-        app.logger.info(setting)
         bHour, bEnd = begin.split(":")
         eHour, eEnd = end.split(":")
 
@@ -156,8 +154,8 @@ def get_date_info():
             spans = sorted(time_spans.keys())
             for i in range(setting['seats']) : time_spans[spans[i % len(spans)]][2] += 1
 
+    for e in DBSession.query(Events).filter(and_(Events.active == 0, Events.doctor_id == pdoctor, Events.date == pdate)):
 
-    for e in connection.Events.find({"active":0, "did" : int(pdoctor), "date" : pdate}):
         h, m = e.time.split(":")
         if int(h) in time_spans:
             time_spans[int(h)][3] += 1
@@ -186,29 +184,20 @@ def save_events():
     format_date = lambda v : "-".join([v[:4], v[4:6], v[-2:]])
 
     try:
-        e = connection.Events()
-        e.id = e.getID()
-        e.uid = int(uid)
-        e.did = int(did)
-        e.date = d
-        e.time = t
-        e.remark = request.values.get("remark", None)
-        e.save()
-
-        doctor = connection.DoctorProfile.one({'id':int(did)}).populate()
-        m = connection.Message()
-        m.id = m.getID()
-        m.subject = u'Booking request submit'
-        m.uid = session['user_profile']['id']
-        m.content = u'%s make a booking with doctor %s at %s , %s.' % (session['user_profile']['name'], doctor['name'], t, format_date(d))
-        m.save()
-
+        e = Events(user_id = uid, doctor_id = did, date = d, time = t, remark = request.values.get("remark", None))
+        DBSession.add(e)
+        doctor = DBSession.query(DoctorProfile).get(did).getUserProfile()
+        m = Message(subject = u'Booking request submit', user_id = session['user_profile']['id'],
+                    content = u'%s make a booking with doctor %s at %s , %s.' % (session['user_profile']['name'], doctor['name'], t, format_date(d)))
+        DBSession.add(m)
+        DBSession.commit()
         return jsonify({
                         "success" : True,
                         "message" : "Save your request successfully !",
                         "event_time" : e.time,
                         })
     except:
+        DBSession.rollback()
         app.logger.error(traceback.format_exc())
         return jsonify({
                         "success" : False,
@@ -224,7 +213,7 @@ def my_booking():
         page = 1
     id = session['user_profile']['id']
 
-    events = list(connection.Events.find({'active':0, 'uid':id}).sort("date"))
+    events = DBSession.query(Events).filter(and_(Events.active == 0, Events.user_id == id)).order_by(Events.date).all()
     paginate_events = Page(events, page = page, items_per_page = 20, url = lambda page:"%s?page=%d" % (url_for("my_booking"), page))
     return render_template("/my_booking.html", events = paginate_events)
 
@@ -238,6 +227,8 @@ def my_message():
         page = 1
     id = session['user_profile']['id']
 
-    msgs = list(connection.Message.find({'active':0, 'uid':id}).sort("create_time", pymongo.DESCENDING))
+    msgs = DBSession.query(Message).filter(and_(Message.active == 0, Message.user_id == id)).order_by(desc(Message.create_time)).all()
+
+#    msgs = list(connection.Message.find({'active':0, 'uid':id}).sort("create_time", pymongo.DESCENDING))
     paginate_msgs = Page(msgs, page = page, items_per_page = 20, url = lambda page:"%s?page=%d" % (url_for("my_message"), page))
     return render_template("/my_message.html", messages = paginate_msgs)

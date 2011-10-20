@@ -27,4 +27,4 @@ LoGGING_LEVEL = logging.INFO
 
 
 #database setting
-SQLALCHEMY_DATABASE_URI = 'sqlite:///%s' % (os.path.join(os.path.dirname(__file__), ".." , "v3.db"))
+SQLALCHEMY_DATABASE_URI = 'sqlite:///%s' % (os.path.join(os.path.dirname(__file__), ".." , "v3new.db"))

@@ -4,9 +4,10 @@ from PIL import Image
 import os
 from datetime import datetime as dt
 from flask import g, render_template, flash, session, redirect, url_for, request
+from sqlalchemy import and_
 
 from sys2do import app
-from sys2do.model import connection
+from sys2do.model import DBSession, User
 from flask.helpers import jsonify
 from sys2do.util.decorator import templated, login_required, has_all_permissions
 from sys2do.util.common import _g, MESSAGE_ERROR, MESSAGE_INFO, upload
@@ -37,30 +38,24 @@ def login_handler():
     email = request.values.get('email', None)
     password = request.values.get('password', None)
     next = request.values.get('next', None)
-    u = connection.User.one({'active' : 0, 'email':email, 'password':password})
     app.logger.info(next)
-    if not u:
+    try:
+        u = DBSession.query(User).filter(and_(User.active == 0, User.email == email, User.password == password)).one()
+    except:
         flash("e-mail or password is not correct !")
         if next : return redirect(url_for("login", next = next))
         return redirect(url_for("login"))
-    else:
-        session['login'] = True
-        session['user_profile'] = u.populate()
-        roles = []
-        permissions = set()
-        for i in u.roles:
-            r = connection.Role.one({"id" : i})
-            roles.append(r.name)
-            for pid in r.permissions:
-                permissions.add(connection.Permission.one({"id" : pid}).name)
-        session['user_profile']['roles'] = roles
-        session['user_profile']['permissions'] = permissions
-#        session.permanent = True
-        app.logger.info("*********** permission")
-        app.logger.info(roles)
-        app.logger.info(permissions)
-        if next:  return redirect(next)
-        return redirect(url_for("index"))
+
+    session['login'] = True
+    session['user_profile'] = u.populate()
+    permissions = set()
+    for g in u.groups:
+        for p in g.permissions:
+            permissions.add(p.name)
+    session['user_profile']['groups'] = [g.name for g in u.groups]
+    session['user_profile']['permissions'] = list(permissions)
+    if next:  return redirect(next)
+    return redirect(url_for("index"))
 
 
 

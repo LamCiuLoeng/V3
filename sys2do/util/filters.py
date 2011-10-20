@@ -41,8 +41,11 @@ def ifFalse(v, default = u""):
 
 
 def getByID(id, obj, attr):
-    from sys2do.model import connection
-    v = getattr(getattr(connection, obj).one({"id" : id}), attr)
+    from sys2do.model import DBSession
+    from sys2do import model as dbModel
+    v = getattr(DBSession.query(getattr(dbModel, obj)).get(id), attr)
+
+#    v = getattr(getattr(, obj).one({"id" : id}), attr)
     return v() if callable(v) else v
 
 

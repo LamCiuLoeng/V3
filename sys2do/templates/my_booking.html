@@ -19,7 +19,7 @@
 			{% for e in events.items%}
 			<tr>
 		        <th scope="row">{{e.date|string2Date}} {{e.time}}</th>
-		        <td>{{e.did|getByID("DoctorProfile","name")}}醫生</td>
+		        <td>{{e.doctor_id|getByID("DoctorProfile","name")}}醫生</td>
 		        <td>{{e.remark}}</td>
 		        <td>{{e.showStatus()}}</td>
 			</tr>

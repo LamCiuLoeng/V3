@@ -42,18 +42,18 @@
 	{% for d in doctors %}
 		<div class="bottom_margin_20 blackborder vpad_10 grey_box">
 			<div class="yellow_box">
-				<h3>{{d['name']}} 醫生</h3>
 				{% set profile = d.getUserProfile() %}
+				<h3>{{profile['name']}} 醫生</h3>
 				<div>				
-				{% if not profile.image_url %}
+				{% if not profile['image_url'] %}
 					<img src="/static/images/no_images.jpg" class="obj_left"/>
 				{% else %}
 					<img src="{{profile.getImage().url}}" class="obj_left"/>
 				{% endif %}
 				</div>
 				<div class="clear"><br /></div>
-				{% if d['desc']%}
-					<p>{{d['desc']}}</p>
+				{% if profile['desc']%}
+					<p>{{profile['desc']}}</p>
 				{% endif %}
 				<p class="text_right"><a class="next_a" href="/schedule?id={{d.id}}">Check the doctor's schedule</a></p>
 			</div>
