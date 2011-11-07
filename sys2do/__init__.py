@@ -64,6 +64,7 @@ app.add_url_rule("/list_clinic", view_func = a.list_clinic)
 app.add_url_rule("/list_doctors", view_func = a.list_doctors)
 app.add_url_rule("/list_doctors_by_clinic", view_func = a.list_doctors_by_clinic)
 app.add_url_rule("/schedule", view_func = a.schedule)
+app.add_url_rule("/search", view_func = a.search, methods = ['GET', 'POST'])
 app.add_url_rule("/get_date_info", view_func = a.get_date_info, methods = ['GET', 'POST'])
 app.add_url_rule("/save_events", view_func = a.save_events, methods = ['GET', 'POST'])
 app.add_url_rule("/my_booking", view_func = a.my_booking, methods = ['GET', 'POST'])
@@ -97,3 +98,9 @@ for f in filters.__all__ : app.jinja_env.filters[f] = getattr(filters, f)
 
 import util.tests as tests
 for t in tests.__all__ : app.jinja_env.tests[t] = getattr(tests, t)
+
+#===============================================================================
+# import the default env value
+#===============================================================================
+from util.master_helper import getDistrictInfo
+app.jinja_env.globals['DISTRICT_INFO'] = getDistrictInfo()

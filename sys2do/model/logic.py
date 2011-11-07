@@ -17,7 +17,7 @@ from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin, User
 from sys2do.util.sa_helper import JSONColumn
 
-__all__ = ['Clinic', 'DoctorProfile', 'NurseProfile', 'Events', 'Message', 'Holiday', 'UploadFile']
+__all__ = ['Clinic', 'DoctorProfile', 'NurseProfile', 'Events', 'Message', 'Holiday', 'UploadFile', 'District', 'Area']
 
 
 clinic_doctor_table = Table('clinic_doctor', metadata,
@@ -53,6 +53,8 @@ class Clinic(DeclarativeBase, SysMixin):
     nurses = relation('NurseProfile', secondary = clinic_nurse_table, backref = 'clinics')
 
 
+    def __str__(self): return self.name
+    def __repr__(self): return self.name
 
 
 class DoctorProfile(DeclarativeBase, SysMixin):
@@ -71,7 +73,7 @@ class DoctorProfile(DeclarativeBase, SysMixin):
         info['worktime_setting'] = self.worktime_setting
         return info
 
-
+    @property
     def name(self):
         return unicode(DBSession.query(User).get(self.user_id))
 
@@ -104,6 +106,15 @@ class Events(DeclarativeBase, SysMixin):
                 1 : "CONFIRMED",
                 2 : "CANCEL"
                 }[self.status]
+
+
+    @property
+    def user(self):
+        return DBSession.query(User).get(self.user_id)
+
+    @property
+    def doctor_info(self):
+        return DBSession.query(DoctorProfile).get(self.doctor_id)
 
 
 class Message(DeclarativeBase, SysMixin):
@@ -154,7 +165,23 @@ class UploadFile(DeclarativeBase, SysMixin):
 
     id = Column(Integer, autoincrement = True, primary_key = True)
     name = Column(Unicode(100))
-    name = Column(Unicode(1000))
+    path = Column(Unicode(1000))
     url = Column(Unicode(1000))
     remark = Column(Unicode(5000))
 
+
+
+class District(DeclarativeBase, SysMixin):
+    __tablename__ = 'district'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Unicode(100))
+
+
+class Area(DeclarativeBase, SysMixin):
+    __tablename__ = 'area'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Unicode(100))
+    district_id = Column(Integer, ForeignKey('district.id'))
+    district = relation(District, backref = backref("area", order_by = id), primaryjoin = "and_(District.id == Area.district_id, Area.active == 0)")

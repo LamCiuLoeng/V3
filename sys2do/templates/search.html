@@ -1,0 +1,33 @@
+{% extends "master.html" %}
+
+{% set current_tab = "t4" %}
+
+{% block content %}
+<div class="grey_box">
+	<div class="yellow_box height_600">	
+		<table class="datalist" width="100%">
+		<thead>
+			<tr>
+		     	<th scope="col" style="width:400px">Clinic Name</th>
+		     	<th scope="col">Clinic Address</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for c in paginate_clinics.items%}
+			<tr>
+		        <th scope="row"><a href="/list_doctors_by_clinic?id={{c.id}}&action_type=m">{{c.name}}</a></th>
+		        <td>{{c.address}}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+		</table>
+		
+		<div class="pagescontainer">
+		   {{paginate_clinics.pager('$link_first $link_previous ~3~ $link_next $link_last',curpage_attr={'class': 'current'},
+		   	              symbol_first='First',symbol_last='Last',symbol_previous='Pre', symbol_next='Next'
+		   )}}
+		</div>
+	</div>
+</div>
+		
+{% endblock %}

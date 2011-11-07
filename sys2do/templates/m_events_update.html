@@ -113,8 +113,8 @@
 	<div class="yellow_box">
 		<div class="baseform">
 		<input type="hidden" name="event_id" id="event_id" value="{{event.id}}"/>
-		<p><label class="label">User</label><span class="field">{{event.uid|getByID("User","name")}}</span></p>
-		<p><label class="label">Doctor</label><span class="field">{{event.did|getByID("DoctorProfile","getUserProfile")}}</span></p>
+		<p><label class="label">User</label><span class="field">{{event.user}}</span></p>
+		<p><label class="label">Doctor</label><span class="field">{{event.doctor_info['name']}}</span></p>
 		<p><label class="label">Booking Date</label><span class="field">{{event.date|string2Date}}</span></p>
 		<p><label class="label">Booking Time</label><span class="field">{{event.time}}</span></p>
 		<p><label class="label">Create Time</label><span class="field">{{event.create_time|formatTime}}</span></p>

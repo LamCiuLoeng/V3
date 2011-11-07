@@ -6,10 +6,12 @@ from webhelpers.paginate import Page
 from flask import g, render_template, flash, session, redirect, url_for, request
 from flask import current_app as app
 from flask.helpers import jsonify
+from sqlalchemy.sql.expression import desc
 
-from sys2do.model import DBSession, Clinic, Group
+from sys2do.model import DBSession, Clinic, Group, DoctorProfile, NurseProfile, Events, Message
 from sys2do.util.common import MESSAGE_INFO, MESSAGE_ERROR, _g, upload
 from sys2do.util.decorator import login_required, templated, has_all_permissions, has_any_permissions, is_all_roles, is_any_roles
+
 
 
 ITEM_PER_PAGE = 20
@@ -24,7 +26,7 @@ def m_clinic_list():
 
 #    cs = list(connection.Clinic.find({'active':0}).sort('name'))
     cs = DBSession.query(Clinic).filter(Clinic.active == 0).order_by(Clinic.name).all()
-    paginate_clinics = Page(cs, page = page, items_per_page = ITEM_PER_PAGE, url = lambda page:"%s?page=%d" % (url_for("m_clinic"), page))
+    paginate_clinics = Page(cs, page = page, items_per_page = ITEM_PER_PAGE, url = lambda page:"%s?page=%d" % (url_for("m_clinic_list"), page))
     return render_template("m_clinic_list.html", paginate_clinics = paginate_clinics)
 
 
@@ -105,13 +107,11 @@ def m_clinic_save():
 @has_any_permissions(["DOCTOR_ADD", "DOCTOR_UPDATE"])
 @login_required
 def m_doctor_list():
-    ds = connection.DoctorProfile.find({'active':0})
+    ds = DBSession.query(DoctorProfile).filter(DoctorProfile.active == 0)
     try:
         page = request.values.get("page", 1)
     except:
         page = 1
-
-    ds = list(connection.DoctorProfile.find({'active':0}))
     paginate_docotrs = Page(ds, page = page, items_per_page = ITEM_PER_PAGE, url = lambda page:"%s?page=%d" % (url_for("m_doctor_list"), page))
     return render_template("m_doctor_list.html", paginate_docotrs = paginate_docotrs)
 
@@ -267,7 +267,7 @@ def m_nurse_list():
     except:
         page = 1
 
-    ns = list(connection.NurseProfile.find({'active':0}))
+    ns = DBSession.query(NurseProfile).filter(NurseProfile.active == 0)
     paginate_nurses = Page(ns, page = page, items_per_page = 20, url = lambda page:"%s?page=%d" % (url_for("m_nurse_list"), page))
     return render_template("m_nurse_list.html", paginate_nurses = paginate_nurses)
 
@@ -432,7 +432,7 @@ def m_events_list():
         page = _g("page", 1)
     except:
         page = 1
-    es = list(connection.Events.find({"active" : 0}).sort("date", pymongo.DESCENDING))
+    es = DBSession.query(Events).filter(Events.active == 0).order_by(desc(Events.date))
     paginate_events = Page(es, page = page, items_per_page = ITEM_PER_PAGE, url = lambda page:"%s?page=%d" % (url_for("m_events_list"), page))
     return {"paginate_events" : paginate_events}
 
@@ -450,29 +450,23 @@ def m_events_update():
     if not action_type in ["m", "c", "p"]:
         flash("No such action !", MESSAGE_ERROR)
         return redirect(url_for("m_events_list"))
-    e = connection.Events.one({"id" : int(id)})
+
+    e = DBSession.query(Events).get(id)
+#    e = connection.Events.one({"id" : int(id)})
 
     if action_type == "m":
         return render_template("m_events_update.html", event = e)
-    elif action_type == "c": #cancel
+    elif action_type == "c": #cancel       
         e.status = 2
-        e.save()
-        msg = connection.Message()
-        msg.id = msg.getID()
-        msg.subject = u"Cancel Booking Event"
-        msg.content = u"%s cancel the booking request." % session['user_profile']['name']
-        msg.uid = e.uid
-        msg.save()
+        DBSession.add(Message(subject = u"Cancel Booking Event", user_id = e.user_id,
+                              content = u"%s cancel the booking request." % session['user_profile']['name']))
+        DBSession.commit()
         return jsonify({"success" : True, "message" : "Update successfully !"})
     elif action_type == "p": #confirmed
         e.status = 1
-        e.save()
-        msg = connection.Message()
-        msg.id = msg.getID()
-        msg.subject = u"Confirm Booking Event"
-        msg.content = u"%s confirm the booking request." % session['user_profile']['name']
-        msg.uid = e.uid
-        msg.save()
+        DBSession.add(Message(subject = u"Confirm Booking Event", user_id = e.user_id,
+                              content = u"%s confirm the booking request." % session['user_profile']['name']))
+        DBSession.commit()
         return jsonify({"success" : True, "message" : "Update successfully !"})
 
 

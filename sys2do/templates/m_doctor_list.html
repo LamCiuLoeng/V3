@@ -16,13 +16,14 @@
 		</thead>
 		<tbody>
 			{% for c in paginate_docotrs.items%}
-				{% set info = c.populate() %}
+				{% set info = c.getUserProfile() %}
 			<tr>
 		        <th scope="row"><a href="/m_doctor_update?id={{c.id}}&action_type=m"><b>{{info['name']}}</b></a></th>
 		        <td>
-		        	{% for cid in c.clinic %}
-		        		{{cid|getByID("Clinic","name")}}&nbsp;
+		        	{% for clinic in c.clinics %}
+		        		{{clinic}}&nbsp;
 		        	{% endfor %}
+		        	
 		        </td>
 			</tr>
 			{% endfor %}

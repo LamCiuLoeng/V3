@@ -58,7 +58,6 @@ user_group_table = Table('system_user_group', metadata,
 )
 
 
-#{ The auth* model itself
 
 
 class Group(DeclarativeBase, SysMixin):
@@ -70,16 +69,12 @@ class Group(DeclarativeBase, SysMixin):
     desc = Column(Unicode(1000))
     users = relation('User', secondary = user_group_table, backref = 'groups')
 
-    def __repr__(self):
-        return self.display_name or self.name
+    def __repr__(self): return self.display_name or self.name
 
-    def __unicode__(self):
-        return self.display_name or self.name
+    def __unicode__(self): return self.display_name or self.name
 
 
-# The 'info' argument we're passing to the email_address and password columns
-# contain metadata that Rum (http://python-rum.org/) can use generate an
-# admin interface for your models.
+
 class User(DeclarativeBase, SysMixin):
     __tablename__ = 'system_user'
 
@@ -91,6 +86,8 @@ class User(DeclarativeBase, SysMixin):
     phone = Column(Unicode(50))
     birthday = Column(Date, default = None)
     image_url = Column(Unicode(100))
+
+    def __str__(self): return "%s %s" % (self.first_name, self.last_name)
 
     def __repr__(self): return "%s %s" % (self.first_name, self.last_name)
 
@@ -104,22 +101,6 @@ class User(DeclarativeBase, SysMixin):
             perms = perms | set(g.permissions)
         return perms
 
-    @classmethod
-    def by_email_address(cls, email):
-        """Return the user object whose email address is ``email``."""
-        return DBSession.query(cls).filter(cls.email_address == email).first()
-
-    @classmethod
-    def by_user_name(cls, username):
-        """Return the user object whose user name is ``username``."""
-        return DBSession.query(cls).filter(cls.user_name == username).first()
-
-    def validate_password(self, password):
-        return self.password == password
-
-    @classmethod
-    def identify(cls, value):
-        return DBSession.query(cls).filter(cls.user_name.match(value)).one()
 
     def populate(self):
         return {

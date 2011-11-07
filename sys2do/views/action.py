@@ -17,7 +17,7 @@ from sys2do.model import DBSession, Clinic
 from sys2do.util.decorator import templated, login_required
 from sys2do.model.logic import DoctorProfile, Events, Holiday, Message
 
-
+ITEM_PER_PAGE = 20
 
 @login_required
 @templated("list_clinic.html")
@@ -36,11 +36,14 @@ def list_clinic():
 def list_doctors():
     id = request.values.get("id", None)
     if not id:
-        dps = connection.DoctorProfile.find({'active':0})
+        dps = DBSession.query(DoctorProfile).filter(DoctorProfile.active == 0)
+#        dps = connection.DoctorProfile.find({'active':0})
         data = [dp.populate() for dp in dps]
     else:
-        c = connection.Clinic.one({'active':0, 'id':int(id)})
-        data = [connection.DoctorProfile.one({'id':i}).populate() for i in c.doctors]
+        c = DBSession.query(Clinic).get(id)
+#        c = connection.Clinic.one({'active':0, 'id':int(id)})
+#        data = [connection.DoctorProfile.one({'id':i}).populate() for i in c.doctors]
+        data = [i.populate() for i in c.doctors]
     return {"doctors" : data}
 
 
@@ -110,8 +113,8 @@ def schedule():
         elif d.strftime("%Y%m%d") in dp.worktime_setting["SPECIAL"]:
             info['avaiable'] = False
         elif Holiday.isHoliday(d):
-            ws = dp['worktime_setting']["HOLIDAY"]
-            info['avaiable'] = len(ws['times']) > 0
+            ws = dp.worktime_setting["HOLIDAY"]
+            info['avaiable'] = len(ws) > 0
             info['holiday'] = True
         else:
             ws = dp.worktime_setting[days[d.weekday()]]
@@ -232,3 +235,21 @@ def my_message():
 #    msgs = list(connection.Message.find({'active':0, 'uid':id}).sort("create_time", pymongo.DESCENDING))
     paginate_msgs = Page(msgs, page = page, items_per_page = 20, url = lambda page:"%s?page=%d" % (url_for("my_message"), page))
     return render_template("/my_message.html", messages = paginate_msgs)
+
+
+@login_required
+def search():
+    d = request.values.get("d", '')
+    q = request.values.get("q", '')
+    try:
+        page = request.values.get("page", 1)
+    except:
+        page = 1
+
+    if not d:
+        cs = DBSession.query(Clinic).filter(and_(Clinic.active == 0, Clinic.name.op("like")("%%%s%%" % q))).all()
+    else:
+        cs = DBSession.query(Clinic).filter(and_(Clinic.active == 0, Clinic.name.op("like")("%%%s%%" % q))).all()
+
+    paginate_clinics = Page(cs, page = page, items_per_page = ITEM_PER_PAGE, url = lambda page:"%s?d=%s&q=%s&page=%d" % (url_for("search"), d or '', q or '', page))
+    return render_template("search.html", paginate_clinics = paginate_clinics, q = q or '', d = d or '')

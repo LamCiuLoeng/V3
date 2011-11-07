@@ -94,10 +94,25 @@
 					</p>
 				</div>
 				<div class="clear"></div>
+										
 				<div id="search_div">
-					<input type="text" name="q" id="search_input" style="vertical-align:middle"/>
-					<input type="image" src="/static/images/search_btn.jpg" style="vertical-align:middle" />
-					<!--  <input type="button" class="btn" value="GO"/>  -->
+					<form action="/search" method="post">
+						<select name="d">
+							<option value=""></option>
+							{%for district,area in DISTRICT_INFO.items()%}
+								<optgroup label="{{district}}">
+									{%for a in area%}
+										{%if a.id == d%}
+											<option value="{{a[0]}}" selected="true">{{a[1]}}</option>
+										{%else%}
+											<option value="{{a[0]}}">{{a[1]}}</option>
+										{%endif%}
+									{%endfor%}
+							{%endfor%}	
+						</select>
+						<input type="text" name="q" id="search_input" style="vertical-align:middle" value="{{q}}"/>
+						<input type="image" src="/static/images/search_btn.jpg" style="vertical-align:middle" />
+					</form>
 				</div>
 			</div>
 		{% endblock %}

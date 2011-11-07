@@ -19,8 +19,8 @@
 		<tbody>
 			{% for e in paginate_events.items%}
 			<tr>
-		        <th scope="row"><a href="/m_events_update?id={{e.id}}&action_type=m"><b>{{e.uid|getByID("User","name")}}</b></a></th>
-		        <td>{{e.did|getByID("DoctorProfile","getUserProfile")}}</td>
+		        <th scope="row"><a href="/m_events_update?id={{e.id}}&action_type=m"><b>{{e.user}}</b></a></th>
+		        <td>{{e.doctor_info['name']}}</td>
 		        <td>{{e.date|string2Date}}</td>
 		        <td>{{e.create_time|formatTime}}</td>
 		        <td>{{e.showStatus()}}</td>
