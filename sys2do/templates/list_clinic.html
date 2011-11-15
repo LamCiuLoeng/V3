@@ -30,30 +30,87 @@
 
 {% block content %}
 
-	{% for c in clinics.items %}
-		<div class="bottom_margin_20 blackborder grey_box">
-			<div class="yellow_box">
-				<h4>{{c.name}}</h4>
-				<div>
-		        	<img src="/static/images/zstp.jpg" width="300px" class="obj_left" height="200px" style="margin-right:15px; border:#000 solid 1px"  />
-					<div id="gmap_div_{{c.id}}" class="obj_left blackborder right_margin_10" style="width:300px;height:200px;"></div>
-				</div>
-				<div class="clear"><br /></div>
-				{% if c.desc %}
-					<p>{{c.desc}}</p>
-				{% endif %}
-				<p class="text_right"><a class="next_a" href="/list_doctors_by_clinic?id={{c.id}}">Check the doctors</a></p>
-			</div>
+
+<table width="1000" border="0" align="center" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><img src="/static/images/gobooking_03.jpg" width="1000" height="315" /></td>
+  </tr>
+  <tr>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td width="48" align="left" valign="top"><img src="/static/images/gobooking_03-02.jpg" width="48" height="126" /></td>
+          <td valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td background="/static/images/gobooking_04.jpg"><img src="/static/images/gobooking_04.jpg" width="22" height="31" /></td>
+              </tr>
+              
+              
+              
+              
+              {% for c in clinics.items %}
+              <tr>
+                <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                          <tr>
+                            <td width="30"><img src="/static/images/gobooking_09.jpg" width="3" height="27" /></td>
+                            <td class="docter_title">{{c.name}}</td>
+                            <td width="240" align="right"><a class="next_a" href="/list_doctors_by_clinic?id={{c.id}}"><img src="/static/images/gobooking_12.jpg" width="237" height="27" /></a></td>
+                          </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                      <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                          <tr>
+                            <td width="400" align="center"><img src="/static/images/gobooking_16.jpg" width="300" height="200" class="img_border" /></td>
+                            <td align="left">
+                            	<div id="gmap_div_{{c.id}}" class="obj_left blackborder right_margin_10" style="width:300px;height:200px;"></div>
+                            </td>
+                          </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                      <td background="/static/images/gobooking_25.jpg"><img src="/static/images/gobooking_25.jpg" width="13" height="42" /></td>
+                    </tr>
+                  </table></td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+              </tr>
+              {% endfor %} 
+              
+              
+              
+              
+              
+              
+              
+            </table></td>
+          <td width="47" align="left" valign="top"><img src="/static/images/gobooking_06.jpg" width="47" height="126" /></td>
+        </tr>
+      </table></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+  	<td align="right">
+  		<div class="pagescontainer">
+		   {{clinics.pager('$link_first $link_previous ~3~ $link_next $link_last',curpage_attr={'class': 'current'},
+		   	              symbol_first='First',symbol_last='Last',symbol_previous='Pre', symbol_next='Next'
+		   )}}
 		</div>
-	{% endfor %}
+  	</td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+</table>
 
 
 
-<div class="pagescontainer">
-   {{clinics.pager('$link_first $link_previous ~3~ $link_next $link_last',curpage_attr={'class': 'current'},
-   	              symbol_first='First',symbol_last='Last',symbol_previous='Pre', symbol_next='Next'
-   )}}
-</div>
+
+
 
 		
 {% endblock %}

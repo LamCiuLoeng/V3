@@ -4,5 +4,86 @@
 
 {% block content %}
 
-		
+
+
+<table width="1000" border="0" align="center" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><img src="/static/images/index_13.jpg" width="1000" height="432" /></td>
+  </tr>
+  <tr>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td width="400" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="center"><table width="350" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                          <tr>
+                            <td width="58"><img src="/static/images/index_18.jpg" width="58" height="22" /></td>
+                            <td background="/static/images/index_19.jpg">&nbsp;</td>
+                            <td width="60" background="/static/images/index_19.jpg"><a href="#">&gt;&gt;More</a></td>
+                          </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                      <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td>
+                       	<marquee behavior="scroll" direction="up" height="50" scrolldelay="100">
+	                    {%for m in messages:%}
+	                      	<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	                          <tr>
+	                            <td width="10"><img src="/static/images/index_24.jpg" width="3" height="22" /></td>
+	                            <td width="250">{{m.content}}</td>
+	                            <td>{{m.update_time|formatTime}}</td>
+	                          </tr>
+	                        </table>
+	                    {%endfor%}
+                       	</marquee>
+                       
+                       </td>
+                    </tr>
+                  </table></td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="center"><table width="350" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td width="26"><img src="/static/images/index_31.jpg" width="26" height="80" /></td>
+                      <td align="center" background="/static/images/index_32.jpg"><img src="/static/images/index_37.jpg" width="51" height="55" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/static/images/index_39.jpg" width="52" height="55" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/static/images/index_41.jpg" width="67" height="56" /></td>
+                      <td width="29"><img src="/static/images/index_34.jpg" width="29" height="80" /></td>
+                    </tr>
+                  </table></td>
+              </tr>
+            </table></td>
+          <td width="200"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td><img src="/static/images/index_21.jpg" width="150" height="143" /></td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td><img src="/static/images/index_45.jpg" width="94" height="24" /></td>
+              </tr>
+            </table></td>
+          <td align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td><img src="/static/images/index_27.jpg" width="128" height="102" /></td>
+                <td><img src="/static/images/index_15.jpg" width="173" height="191" /></td>
+              </tr>
+            </table></td>
+        </tr>
+      </table></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+</table>	
 {% endblock %}

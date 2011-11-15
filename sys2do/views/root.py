@@ -5,9 +5,10 @@ import os
 from datetime import datetime as dt
 from flask import g, render_template, flash, session, redirect, url_for, request
 from sqlalchemy import and_
+from sqlalchemy.sql.expression import desc
 
 from sys2do import app
-from sys2do.model import DBSession, User
+from sys2do.model import DBSession, User, Message
 from flask.helpers import jsonify
 from sys2do.util.decorator import templated, login_required, has_all_permissions
 from sys2do.util.common import _g, MESSAGE_ERROR, MESSAGE_INFO, upload
@@ -23,7 +24,10 @@ def index():
         return redirect(url_for('login'))
     user_profile = session['user_profile']
     app.logger.debug('A value for debugging')
-    return {"user_profile" : user_profile}
+
+    ms = DBSession.query(Message).order_by(desc(Message.update_time))[:5]
+
+    return {"user_profile" : user_profile , "messages" : ms}
 
 
 

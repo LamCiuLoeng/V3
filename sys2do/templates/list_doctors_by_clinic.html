@@ -1,62 +1,88 @@
 {% extends "master.html" %}
 
 {% block extJS %}
-<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-<script language="JavaScript" type="text/javascript">
-//<![CDATA[
-	$(document).ready(function(){
-			var map =new google.maps.Map($("#gmap_div")[0],{
-				zoom : 13,
-				mapTypeId:google.maps.MapTypeId.ROADMAP,
-				minZoom:10,
-                maxZoom:18
-			})
-			var marker = new google.maps.Marker({
-		        position: new google.maps.LatLng({{clinic.location[0]}},{{clinic.location[1]}}),
-		        title: "{{clinic.name}}",
-		        map:map
-		      });
-		    map.setCenter(marker.getPosition());
-	});
-//]]>
-</script>
+
 {% endblock %}
 
 
 
 {% block content %}
-	<div class="bottom_margin_20 blackborder vpad_10 grey_box">
-		<div class="yellow_box">
-			<h4>{{clinic.name}}</h4>
-			<div>
-				<img src="/static/images/zstp.jpg" width="300px" height="200px" class="obj_left" style="margin-right:15px; border:#000 solid 1px"  />
-				<div id="gmap_div" class="obj_left blackborder right_margin_10" style="width:300px;height:200px;"></div>
-			</div>
-			<div class="clear"><br /></div>
-			{% if clinic.desc %}
-				<p>{{clinic.desc|ifFalse}}</p>
-			{% endif %}
-			<p class="text_left"><a class="back_a" href="/list_clinic">Back to clinic list</a></p>
-		</div>		
-	</div>
-	{% for d in doctors %}
-		<div class="bottom_margin_20 blackborder vpad_10 grey_box">
-			<div class="yellow_box">
-				{% set profile = d.getUserProfile() %}
-				<h3>{{profile['name']}} 醫生</h3>
-				<div>				
-				{% if not profile['image_url'] %}
-					<img src="/static/images/no_images.jpg" class="obj_left"/>
-				{% else %}
-					<img src="{{profile.getImage().url}}" class="obj_left"/>
-				{% endif %}
-				</div>
-				<div class="clear"><br /></div>
-				{% if profile['desc']%}
-					<p>{{profile['desc']}}</p>
-				{% endif %}
-				<p class="text_right"><a class="next_a" href="/schedule?id={{d.id}}">Check the doctor's schedule</a></p>
-			</div>
-		</div>
-	{% endfor %}	
+	<table width="1000" border="0" align="center" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><img src="/static/images/gobooking_03.jpg" width="1000" height="315" /></td>
+  </tr>
+  <tr>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td width="48" align="left" valign="top"><img src="/static/images/gobooking_03-02.jpg" width="48" height="126" /></td>
+          <td valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td background="/static/images/gobooking_04.jpg"><img src="/static/images/gobooking_04.jpg" width="22" height="31" /></td>
+              </tr>
+              <tr>
+                <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                          <tr>
+                            <td width="30"><img src="/static/images/gobooking_09.jpg" width="3" height="27" /></td>
+                            <td class="docter_title">{{clinic.name}}</td>
+                          </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                      <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                          <tr>
+                            <td width="370" align="center"><img src="/static/images/gobooking_16.jpg" width="300" height="200" class="img_border" /></td>
+                            <td align="left" class="doctor_info">{{clinic.desc|ifFalse}}</td>
+                          </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                      <td>&nbsp;</td>
+                    </tr>
+                  </table></td>
+              </tr>
+              <tr>
+                <td bgcolor="#157DB0">
+                
+                	{% for d in doctors %}
+                	{% set profile = d.getUserProfile() %}
+	                	<div class="doctor_div">
+		                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+		                      <tr>
+		                        <td align="center">
+		                        	{% if not profile['image_url'] %}
+										<a class="next_a" href="/schedule?id={{d.id}}"><img src="/static/images/doctors_09.jpg" width="156" height="181" /></a>
+									{% else %}
+										<a class="next_a" href="/schedule?id={{d.id}}"><img src="/static/images/no_images.jpg" width="156" height="181"/></a>
+									{% endif %}
+		                        </td>
+		                      </tr>
+		                      <tr>
+		                        <td align="center">{{profile['name']}}醫生</td>
+		                      </tr>
+		                    </table>
+	                    </div>
+                    {% endfor %}
+                 </td>
+              </tr>
+              <tr>
+                <td><img src="/static/images/doctors_13.jpg" width="905" height="21" /></td>
+              </tr>
+              <tr>
+			    <td>&nbsp;</td>
+			  </tr>
+              <tr>
+              	<td><a class="back_a" href="/list_clinic">Back to clinic list</a></td>
+              </tr>
+            </table></td>
+          <td width="47" align="left" valign="top"><img src="/static/images/gobooking_06.jpg" width="47" height="126" /></td>
+        </tr>
+      </table></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+
+</table>
 {% endblock %}

@@ -8,18 +8,6 @@
 	
 	<title>{% block title %}IEASYBOOK {% block subtitle %}{% endblock %}{% endblock %}</title>
 	
-	
-	<link href="{{url_for('.static', filename='css/reset.css')}}" rel="stylesheet" type="text/css" />
-	<link href="{{url_for('.static', filename='css/grid960.css')}}" rel="stylesheet" type="text/css" />
-	<link href="{{url_for('.static', filename='css/type.css')}}" rel="stylesheet" type="text/css" />
-	<link href="{{url_for('.static', filename='css/tables.css')}}" rel="stylesheet" type="text/css" />
-	<link href="{{url_for('.static', filename='css/forms.css')}}" rel="stylesheet" type="text/css" />
-	<link href="{{url_for('.static', filename='css/helpers.css')}}" rel="stylesheet" type="text/css" />
-	<link href="{{url_for('.static', filename='css/ux.css')}}" rel="stylesheet" type="text/css" />
-	
-	<link href="{{url_for('.static', filename='css/jquery.pnotify.default.css')}}" rel="stylesheet" type="text/css" />
-	<link href="{{url_for('.static', filename='css/jquery-ui-1.8.12.custom.css')}}" rel="stylesheet" type="text/css" />
-	
 	<link href="{{url_for('.static', filename='css/screen.css')}}" rel="stylesheet" type="text/css" />
 	{% block extCSS %}{% endblock %}
 	
@@ -75,66 +63,44 @@
 </head>
 
 <body>
-	<div id="container" class="outter">
+
 		{% block header %}
-			<div id="header" class="full">
-				<div id="welcome_div">
-					<p style="margin:0px;color:#fff;">Welcome , <a href="/profile" class="login_top">{{session['user_profile']['name']}}</a> | <a href="/logout_handler" class="login_top">Logout</a></p>
-				</div>
-				<div id="menu">
-					<p style="margin:15px;">
-						<a href="{{url_for('list_clinic')}}"><span>Go Booking</span></a>|
-						<a href="{{url_for('my_booking')}}"><span>My Booking</span></a>|
-						<a href="{{url_for('my_message')}}"><span>Message</span></a>|
-						<a href="{{url_for('m_clinic_list')}}"><span>Clinic</span></a>|
-						<a href="{{url_for('m_doctor_list')}}"><span>Doctor</span></a>|
-						<a href="{{url_for('m_nurse_list')}}"><span>Nurse</span></a>|
-						<a href="{{url_for('m_user_list')}}"><span>User</span></a>|
-						<a href="{{url_for('m_events_list')}}"><span>Booking</span></a>
-					</p>
-				</div>
-				<div class="clear"></div>
-										
-				<div id="search_div">
-					<form action="/search" method="post">
-						<select name="d">
-							<option value=""></option>
-							{%for district,area in DISTRICT_INFO.items()%}
-								<optgroup label="{{district}}">
-									{%for a in area%}
-										{%if a.id == d%}
-											<option value="{{a[0]}}" selected="true">{{a[1]}}</option>
-										{%else%}
-											<option value="{{a[0]}}">{{a[1]}}</option>
-										{%endif%}
-									{%endfor%}
-							{%endfor%}	
-						</select>
-						<input type="text" name="q" id="search_input" style="vertical-align:middle" value="{{q}}"/>
-						<input type="image" src="/static/images/search_btn.jpg" style="vertical-align:middle" />
-					</form>
-				</div>
-			</div>
+			<table width="1000" border="0" align="center" cellpadding="0" cellspacing="0">
+			  <tr>
+			    <td width="337"><a href="/index"><img src="/static/images/index_01.jpg" width="337" height="99" /></a></td>
+			    <td align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+			        <tr>
+			          <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+			              <tr>
+			                <td width="250">&nbsp;</td>
+			                <td width="230"><img src="/static/images/index_03.jpg" width="230" height="48" /></td>
+			                <td width="60" align="center"><img src="/static/images/index_09.jpg" width="47" height="17" /></td>
+			                <td width="40"><img src="/static/images/index_06.jpg" width="37" height="37" /></td>
+			                <td><img src="/static/images/index_07.jpg" width="37" height="37" /></td>
+			              </tr>
+			            </table></td>
+			        </tr>
+			        <tr>
+			          <td><img src="/static/images/index_12.jpg" width="663" height="51" /></td>
+			        </tr>
+			      </table></td>
+			  </tr>
+			</table>
 		{% endblock %}
 
 		
 		
-		{% block main %}
-			<div id="main_content" class="full height_700">
-				<img src="/static/images/main_top.jpg" />
-				<div style="margin:0px 10px 10px 10px;">
-					{% block content %}
-					<!-- Main Content Here -->
-					{% endblock %}
-				</div>
-			</div>
+		{% block content %}
+			
 		{% endblock %}
 		
 		{% block footer %}
-			<div id="footer" class="full bg_lightblue bottom_margin_10">
-				<img src="/static/images/esolution.jpg"/>
-			</div>
+			<table width="1000" border="0" align="center" cellpadding="0" cellspacing="0">
+			  <tr>
+			    <td><img src="/static/images/index_54.jpg" width="1000" height="80" /></td>
+			  </tr>
+			</table>
 		{% endblock %}
-	</div>
+
 </body>
 </html>
