@@ -17,7 +17,7 @@ app.config.from_object("sys2do.setting")
 if app.config.get("LOGGING_FILE", True):
     import logging, logging.handlers
     file_handler = logging.handlers.TimedRotatingFileHandler(app.config.get("LOGGING_FILE_PATH"), when = 'D', interval = 1, backupCount = 5, encoding = "utf-8", delay = False)
-    file_handler.setLevel(app.config.get("LoGGING_LEVEL"))
+    file_handler.setLevel(app.config.get("LOGGING_LEVEL"))
     file_handler.setFormatter(logging.Formatter('''
     Message type:       %(levelname)s
     Location:           %(pathname)s:%(lineno)d

@@ -23,7 +23,7 @@ SESSION_COOKIE_NAME = 'session'
 #config for logging
 LOGGING_FILE = True
 LOGGING_FILE_PATH = os.path.join(os.path.dirname(__file__), "log.txt")
-LoGGING_LEVEL = logging.INFO
+LOGGING_LEVEL = logging.INFO
 
 
 #database setting
