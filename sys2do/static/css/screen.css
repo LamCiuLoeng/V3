@@ -1,11 +1,7 @@
 @charset "utf-8";
-body {
-	margin-left: 0px;
-	margin-top: 0px;
-	margin-right: 0px;
-	margin-bottom: 0px;
+img{
+	border:none;
 }
-
 body,td,th {
 	font-size: 12px;
 	color: #000;
@@ -13,11 +9,12 @@ body,td,th {
 	line-height: normal;
 	text-decoration: none;
 }
-
-image {
-	border : none;
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
 }
-
 a:link {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 12px;
@@ -77,4 +74,114 @@ a:active {
 	font-size:18px;
 	color:#069;
 	line-height:24px;
+}
+.date_stlye{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:24px;
+	font-weight:bold;
+	color:#000;
+}
+.calendar_div{
+	float:left;
+	width:127px;
+	height:66px;
+	border:#fff 1px solid;
+	background-color:#999;
+}
+.calendar_div .number{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:18px;
+	font-weight:bold;
+	color:#000;
+}
+.calendar_div_green{
+	float:left;
+	width:127px;
+	height:66px;
+	border:#fff 1px solid;
+	background-color:#d2e178;
+}
+.calendar_div_green .number{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:18px;
+	font-weight:bold;
+	color:#000;
+}
+.calendar_div_blue{
+	float:left;
+	width:127px;
+	height:66px;
+	border:#fff 1px solid;
+	background-color:#96ccef;
+}
+.calendar_div_blue .number{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:18px;
+	font-weight:bold;
+	color:#000;
+}
+.calendar_div_red{
+	float:left;
+	width:127px;
+	height:66px;
+	border:#fff 1px solid;
+	background-color:#f5b7b7;
+}
+.calendar_div_red .number{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:18px;
+	font-weight:bold;
+	color:#F00;
+}
+.week_text{
+	float:left;
+	width:129px;
+	height:55px;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:20px;
+	font-weight:bold;
+	color:#000000;
+	text-align:center;
+	line-height:55px;
+}
+.calendar_div_darkgreen{
+	float:left;
+	width:127px;
+	height:66px;
+	border:#fff 1px solid;
+	background-color:#6C6;
+}
+.calendar_div_darkgreen .number{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:18px;
+	font-weight:bold;
+	color:#000;
+}
+.bg_table{
+	border-left:#ccd solid 1px;
+}
+.bg_table thead tr td{
+	font-size:14px;
+	font-weight:bold;
+	color:#FFF;
+	text-align:center;
+	line-height:30px;
+	height:30px;
+	background-color:#069;
+	border-top:#ccd solid 1px;
+	border-right:#ccd solid 1px;
+	border-bottom:#ccd solid 1px;
+}
+.bg_table tr td{
+	font-size:12px;
+	color:#900;
+	text-align:center;
+	border-right:#ccd solid 1px;
+	border-bottom:#ccd solid 1px;
+}
+.bg_table .single{
+	background-color:#eed;
+}
+.bg_table .double{
+	background-color:#ffe;
 }

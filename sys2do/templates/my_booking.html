@@ -4,21 +4,21 @@
 
 {% block content %}
 
-<div class="grey_box">
-	<div class="yellow_box height_600">
-		<table class="datalist" width="100%">
+		<br />
+	
+		<table width="900" border="0" align="center" cellpadding="0" cellspacing="0" class="bg_table">
 		<thead>
 			<tr>
-		     	<th scope="col">Booking Time</th>
-		     	<th scope="col">Doctor</th>
-		     	<th scope="col">Comment</th>
-		     	<th scope="col">Status</th>
+		     	<td>Booking Time</th>
+		     	<td>Doctor</th>
+		     	<td>Comment</th>
+		     	<td>Status</th>
 			</tr>
 		</thead>
 		<tbody>
 			{% for e in events.items%}
 			<tr>
-		        <th scope="row">{{e.date|string2Date}} {{e.time}}</th>
+		        <td>{{e.date|string2Date}} {{e.time}}</th>
 		        <td>{{e.doctor_id|getByID("DoctorProfile","name")}}醫生</td>
 		        <td>{{e.remark}}</td>
 		        <td>{{e.showStatus()}}</td>
@@ -32,8 +32,6 @@
 		   	              symbol_first='First',symbol_last='Last',symbol_previous='Pre', symbol_next='Next'
 		   )}}
 		</div>
-	</div>
-</div>
 
-		
+		<br />
 {% endblock %}

@@ -4,15 +4,7 @@
 
 {% block extCSS %}
 <style type="text/css">
-	.time_span{
-		border : 1px solid #CCCCCC;
-		margin-top : 5px;
-	}
-	
-	.booked_u{
-		font-size:10px;
-		margin-left:5px;
-	}
+
 </style>
 {% endblock %}
 
@@ -25,10 +17,10 @@
 	$(document).ready(function(){
 		$(".cal_enable").hover(
 			function (){
-    			$(this).addClass("cal_box_selected");
+    			$(this).addClass("calendar_div_darkgreen");
 			},
 			function(){
-				$(this).removeClass("cal_box_selected");
+				$(this).removeClass("calendar_div_darkgreen");
 			}
 		);
 		
@@ -140,67 +132,155 @@
 {% endblock %}
 
 {% block content %}
-		<div class="grey_box">
-			<div class="yellow_box">
-				<div class="quarter first vpad_10 text_center">
-					<h2>{{profile['name']}}醫生</h2>
-					{% if not profile['image_url']%}
-						<img src="/static/images/no_images.jpg"/>
-					{% else %}
-						<img src=""/>
-					{% endif %}
-					{% if doctor['desc'] %}
-						<p>{{doctor['desc']}}</p>
-					{% endif %}
-				</div>
-			
-			
-				<div class="vpad_10">
-					<h2 class="text_center">{{current.strftime('%Y.%m')}}</h2>
-					<div style="overflow: auto; width: 650px;" class="cal_first">
-						{% for h in ['MON','TUE','WED','THU','FRI','SAT','SUN'] %}
-								<div class="cal_header text_center "><b>{{h}}</b></div>
-						{% endfor %}
-						
-						{% for d in schedule %}
+<table width="1000" border="0" align="center" cellpadding="0" cellspacing="0">
+  <tr>
+    <td><img src="/static/images/doctors_02.jpg" width="1000" height="133" /></td>
+  </tr>
+  <tr>
+    <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="48" align="left" valign="top"><img src="/static/images/gobooking_03-02.jpg" width="48" height="126" /></td>
+        <td valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td background="/static/images/gobooking_04.jpg"><img src="/static/images/gobooking_04.jpg" width="22" height="31" /></td>
+          </tr>
+          <tr>
+            <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td width="30"><img src="/static/images/gobooking_09.jpg" width="3" height="27" /></td>
+                    <td class="docter_title">{{profile['name']}}醫生 </td>
+                    </tr>
+                  </table></td>
+                </tr>
+              <tr>
+                <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td width="280" align="center"><img src="/static/images/doctors_09.jpg" width="156" height="181" class="img_border" /></td>
+                    <td align="left"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td height="200" class="doctor_info">{{doctor['desc']|ifFalse}}</td>
+                        </tr>
+                      <tr>
+                        <td align="right"><a class="back_a" href="{{request.referrer}}"><img src="/static/images/schedule_03.jpg" width="237" height="27" /></a></td>
+                        </tr>
+                      </table></td>
+                    </tr>
+                  </table></td>
+                </tr>
+              <tr>
+                <td height="30">&nbsp;</td>
+                </tr>
+              </table></td>
+          </tr>
+          <tr>
+            <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td width="33%" align="center" class="date_stlye"><a href="/schedule?id={{doctor.id}}&y={{pre.year}}&m={{pre.month}}">Previously Month</a></td>
+                <td width="33%" align="center" class="date_stlye">{{current.strftime('%Y.%m')}}</td>
+                <td width="33%" align="center" class="date_stlye"><a href="/schedule?id={{doctor.id}}&y={{next.year}}&m={{next.month}}">Next Month</a></td>
+              </tr>
+            </table></td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td><div class="week_text">Mon</div>
+              <div class="week_text">Tue</div>
+              <div class="week_text">Wed</div>
+              <div class="week_text">Thu</div>
+              <div class="week_text">Fri</div>
+              <div class="week_text">Sat</div>
+              <div class="week_text">Sun</div>
+              
+              {% for d in schedule %}
 							{% set div_id = "div_%s" %d['date'].strftime("%Y%m%d") %}
 							
 							{% if not d['this_month'] %}
-								<div class="cal_box cal_not_this_month" id="{{div_id}}">{{d['date'].day}}</div>
+								<!-- div class="cal_box cal_not_this_month" id="{{div_id}}">{{d['date'].day}}</div -->
+								
+								    <div class="calendar_div_blue">
+									    <table width="100%" cellspacing="0" cellpadding="0" border="0">
+									    <tbody><tr>
+									      <td>&nbsp;</td>
+									      <td width="40" height="40" class="number">&nbsp;</td>
+									    </tr>
+									    <tr>
+									      <td>&nbsp;</td>
+									      <td>&nbsp;</td>
+									    </tr>
+									  </tbody></table>
+									</div>
 							{% else %}
 								{% if not d['avaiable'] %}
-									<div class="cal_box cal_disable" id="{{div_id}}">{{d['date'].day}}</div>
+									<!-- div class="cal_box cal_disable" id="{{div_id}}">{{d['date'].day}}</div -->
+								
+									<div class="calendar_div">
+						              <table width="100%" cellspacing="0" cellpadding="0" border="0">
+						                <tbody><tr>
+						                  <td>&nbsp;</td>
+						                  <td width="40" height="40" class="number">{{d['date'].day}}</td>
+						                </tr>
+						                <tr>
+						                  <td>&nbsp;</td>
+						                  <td>&nbsp;</td>
+						                </tr>
+						              </tbody></table>
+						            </div>
 								{% elif d['is_booked'] %}
-									<div class="cal_box cal_booked" id="{{div_id}}">
-										{{d['date'].day}}
-										<br />
-										<u class="booked_u">booked at {{d['event_time']|ampm}}</u>
-									</div>
+									<div class="calendar_div_red">
+						                <table width="100%" cellspacing="0" cellpadding="0" border="0">
+						                  <tbody><tr>
+						                    <td>&nbsp;</td>
+						                    <td width="40" height="40" class="number">{{d['date'].day}}</td>
+						                  </tr>
+						                  <tr>
+						                    <td colspan="2">&nbsp;booked at {{d['event_time']|ampm}}</td>
+						                  </tr>
+						                </tbody></table>
+						              </div>
 								{% else%}
-									<div class="cal_box cal_enable" id="{{div_id}}">
-										{{d['date'].day}}
+			
+									<div class="calendar_div_green cal_enable" id="{{div_id}}">
 										<input type="hidden" name="date" value="{{d['date'].strftime('%Y%m%d')}}"/>
 										<input type="hidden" name="booked" value="{{d['events']|length}}"/>
-									</div>
+						              <table width="100%" cellspacing="0" cellpadding="0" border="0">
+						                <tbody><tr>
+						                  <td>&nbsp;</td>
+						                  <td width="40" height="40" class="number">{{d['date'].day}}</td>
+						                </tr>
+						                <tr>
+						                  <td>&nbsp;</td>
+						                  <td>&nbsp;</td>
+						                </tr>
+						              </tbody></table>
+						            </div>
+									
+									
 								{% endif %}
 							{% endif %}
 						{% endfor %}
-					</div>
-					<div class="clear"><br /></div>
-					<div class="pagescontainer">
-						<a href="/schedule?id={{doctor.id}}&y={{pre.year}}&m={{pre.month}}">Previously Month</a>&nbsp;&nbsp;<a href="/schedule?id={{doctor.id}}&y={{next.year}}&m={{next.month}}">Next Month</a>
-					</div>
-				</div>
-				
-				<p><a class="back_a" href="{{request.referrer}}">Back to the clinic</a></p>
-			</div>
-		</div>
-		
-		<div id="dialog-form" title="Create New Booking Request" style="display:none">
-			<div id="time_spans"></div>
-			<div>
-				<label>Remark</label><br />
-				<textarea name="remark" id="remark" style="width:300px;height:70px;"></textarea>
-			</div>
-		</div>
+              </td>
+          </tr>
+          </table></td>
+        <td width="47" align="left" valign="top"><img src="/static/images/gobooking_06.jpg" width="47" height="126" /></td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+
+
+
+<div id="dialog-form" title="Create New Booking Request" style="display:none">
+	<div id="time_spans"></div>
+	<div>
+		<label>Remark</label><br />
+		<textarea name="remark" id="remark" style="width:300px;height:70px;"></textarea>
+	</div>
+</div>
 {% endblock %}

@@ -7,7 +7,8 @@
 	{% endblock %}
 	
 	<title>{% block title %}IEASYBOOK {% block subtitle %}{% endblock %}{% endblock %}</title>
-	
+	<link href="{{url_for('.static', filename='css/jquery.pnotify.default.css')}}" rel="stylesheet" type="text/css" />
+	<link href="{{url_for('.static', filename='css/jquery-ui-1.8.12.custom.css')}}" rel="stylesheet" type="text/css" />
 	<link href="{{url_for('.static', filename='css/screen.css')}}" rel="stylesheet" type="text/css" />
 	{% block extCSS %}{% endblock %}
 	
@@ -73,15 +74,48 @@
 			          <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
 			              <tr>
 			                <td width="250">&nbsp;</td>
-			                <td width="230"><img src="/static/images/index_03.jpg" width="230" height="48" /></td>
-			                <td width="60" align="center"><img src="/static/images/index_09.jpg" width="47" height="17" /></td>
-			                <td width="40"><img src="/static/images/index_06.jpg" width="37" height="37" /></td>
+			                <td width="230">
+			                	<!-- 
+			                	<img src="/static/images/index_03.jpg" width="230" height="48" />
+			                	 -->
+			                	 <a href="/index" class="login_top">Welcome to Ieasybooking !</a> 
+			                	
+			                	<!-- 
+			                	<img src="/static/images/index_09.jpg" width="47" height="17" />
+			                	 -->
+			                	 [ <a href="/logout_handler" class="login_top">Logout</a> ]
+			                </td>
+			                <td width="40">
+			                	<img src="/static/images/index_06.jpg" width="37" height="37" /></td>
 			                <td><img src="/static/images/index_07.jpg" width="37" height="37" /></td>
 			              </tr>
 			            </table></td>
 			        </tr>
 			        <tr>
-			          <td><img src="/static/images/index_12.jpg" width="663" height="51" /></td>
+			          <td align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+			              <tr>
+			                <td width="94"><a href="{{url_for('list_clinic')}}"><img src="/static/images/schedule_03.jpg" width="94" height="32" /></a></td>
+			                <td width="2"><img src="/static/images/schedule_04.jpg" width="2" height="32" /></td>
+			                <td width="94"><a href="{{url_for('my_booking')}}"><img src="/static/images/schedule_05.jpg" width="94" height="32" /></a></td>
+			                <td width="2"><img src="/static/images/schedule_04.jpg" width="2" height="32" /></td>
+			                
+			                <td width="75"><a href="{{url_for('my_message')}}"><img src="/static/images/schedule_07.jpg" width="75" height="32" /></a></td>
+			                <!-- 
+			                <td width="2"><img src="/static/images/schedule_04.jpg" width="2" height="32" /></td>
+			                <td width="56"><a href="{{url_for('m_clinic_list')}}"><img src="/static/images/schedule_09.jpg" width="56" height="32" /></a></td>
+			                <td width="2"><img src="/static/images/schedule_04.jpg" width="2" height="32" /></td>
+			                <td width="68"><a href="{{url_for('m_doctor_list')}}"><img src="/static/images/schedule_11.jpg" width="68" height="32" /></a></td>
+			                <td width="2"><img src="/static/images/schedule_04.jpg" width="2" height="32" /></td>
+			                <td width="58"><a href="{{url_for('m_nurse_list')}}"><img src="/static/images/schedule_13.jpg" width="58" height="32" /></a></td>
+			                <td width="2"><img src="/static/images/schedule_04.jpg" width="2" height="32" /></td>
+			                <td width="50"><a href="{{url_for('m_user_list')}}"><img src="/static/images/schedule_15.jpg" width="50" height="32" /></a></td>
+			                <td width="2"><img src="/static/images/schedule_04.jpg" width="2" height="32" /></td>
+			                <td width="94"><a href="{{url_for('m_events_list')}}"><img src="/static/images/schedule_17.jpg" width="73" height="32" /></a></td>
+			                 -->
+			                 
+			                 
+			              </tr>
+			            </table></td>
 			        </tr>
 			      </table></td>
 			  </tr>

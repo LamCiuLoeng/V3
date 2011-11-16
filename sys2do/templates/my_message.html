@@ -2,37 +2,44 @@
 
 {% set current_tab = "t3" %}
 
+{% block extCSS %}
+<style type="text/css">
+.bg_table {	border-left:#ccd solid 1px;}
+</style>
+{% endblock %}
+
+
 {% block content %}
-<div class="grey_box">
-	<div class="yellow_box height_600">
-		<table class="datalist" width="100%">
+	<br />
+
+		<table width="900" border="0" align="center" cellpadding="0" cellspacing="0" class="bg_table">
 		<thead>
 			<tr>
-		     	<th scope="col">Subject</th>
-		     	<th scope="col">Time</th>
-		     	<th scope="col">Type</th>
-		     	<th scope="col">Content</th>
+		     	<td>Subject</th>
+		     	<td>Time</th>
+		     	<td>Type</th>
+		     	<td>Content</th>
 			</tr>
 		</thead>
 		<tbody>
 			{% for m in messages.items%}
 			<tr>
-		        <th scope="row">{{m.subject}}</td>
-		        <td>{{m.time|formatTime}}</th>
-		        <td>{{m.type}}</td>
-		        <td>{{m.content}}</td>
+		        <td>{{m.subject}}</td>
+		        <td>{{m.time|formatTime}}&nbsp;</th>
+		        <td>{{m.type|ifFalse}}&nbsp;</td>
+		        <td>{{m.content}}&nbsp;</td>
 			</tr>
 			{% endfor %}
 		</tbody>
 		</table>
 		
-		<div class="pagescontainer">
+		
+<div class="pagescontainer">
 		   {{messages.pager('$link_first $link_previous ~3~ $link_next $link_last',curpage_attr={'class': 'current'},
 		   	              symbol_first='First',symbol_last='Last',symbol_previous='Pre', symbol_next='Next'
 		   )}}
 		</div>
-	</div>
-</div>
-
+		
+		<br />
 		
 {% endblock %}
