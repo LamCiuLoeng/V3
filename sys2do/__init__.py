@@ -31,9 +31,14 @@ if app.config.get("LOGGING_FILE", True):
 # sys.py
 #===============================================================================
 import views.sys as s
-for error_code in [403, 404, 500] : app.error_handlers[error_code] = s.error_page(error_code)
+for error_code in [403, 404, 500] : app.error_handler_spec[error_code] = s.error_page(error_code)
 
 
+#===============================================================================
+# api.sys
+#===============================================================================
+import views.api as api
+app.add_url_rule("/api", view_func = api.doAction, methods = ['GET', 'POST'])
 #===============================================================================
 # root.py
 #===============================================================================

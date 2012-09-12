@@ -9,7 +9,7 @@
 
 import datetime
 from sqlalchemy import Table, ForeignKey, Column, Date, Time
-from sqlalchemy.types import Unicode, Integer, DateTime
+from sqlalchemy.types import Unicode, Integer, DateTime, Text
 from sqlalchemy.orm import relation, backref
 from sqlalchemy.sql.expression import and_
 
@@ -18,6 +18,24 @@ from auth import SysMixin, User
 from sys2do.util.sa_helper import JSONColumn
 
 __all__ = ['Clinic', 'DoctorProfile', 'NurseProfile', 'Events', 'Message', 'Holiday', 'UploadFile', 'District', 'Area']
+
+
+class District(DeclarativeBase, SysMixin):
+    __tablename__ = 'district'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Text)
+
+
+class Area(DeclarativeBase, SysMixin):
+    __tablename__ = 'area'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    name = Column(Text)
+    district_id = Column(Integer, ForeignKey('district.id'))
+    district = relation(District, backref = backref("area", order_by = id), primaryjoin = "and_(District.id == Area.district_id, Area.active == 0)")
+
+
 
 
 clinic_doctor_table = Table('clinic_doctor', metadata,
@@ -40,17 +58,19 @@ class Clinic(DeclarativeBase, SysMixin):
     __tablename__ = 'clinic'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    code = Column(Unicode(100))
-    name = Column(Unicode(100))
-    address = Column(Unicode(1000))
-    desc = Column(Unicode(1000))
-    tel = Column(Unicode(50))
-    website = Column(Unicode(100))
-    district = Column(Unicode(500))
-    street = Column(Unicode(500))
-    location = Column(Unicode(20))
+    code = Column(Text)
+    name = Column(Text)
+    address = Column(Text)
+    desc = Column(Text)
+    tel = Column(Text)
+    website = Column(Text)
+    district = Column(Text)
+    street = Column(Text)
+    location = Column(Text)
     doctors = relation('DoctorProfile', secondary = clinic_doctor_table, backref = 'clinics')
     nurses = relation('NurseProfile', secondary = clinic_nurse_table, backref = 'clinics')
+    area_id = Column(Integer, ForeignKey('area.id'))
+    area = relation(Area, backref = backref("clinics", order_by = id), primaryjoin = "and_(Area.id == Clinic.area_id, Clinic.active == 0)")
 
 
     def __str__(self): return self.name
@@ -64,6 +84,9 @@ class DoctorProfile(DeclarativeBase, SysMixin):
     user_id = Column(Integer)
     desc = Column(Unicode(1000))
     worktime_setting = Column(JSONColumn(5000))
+    rating_score = Column(Integer, default = 0)
+    rating_count = Column(Integer, default = 0)
+
 
     def getUserProfile(self):
         user = DBSession.query(User).get(self.user_id)
@@ -77,6 +100,21 @@ class DoctorProfile(DeclarativeBase, SysMixin):
     def name(self):
         return unicode(DBSession.query(User).get(self.user_id))
 
+    @property
+    def rating(self):
+        if self.rating_count == 0 : return 0
+        return self.rating_score / self.rating_count
+
+
+
+class DoctorComment(DeclarativeBase, SysMixin):
+    __tablename__ = 'doctor_comment'
+
+    id = Column(Integer, autoincrement = True, primary_key = True)
+    doctor_id = Column(Integer, ForeignKey('doctor_profile.id'))
+    doctor = relation(DoctorProfile, backref = backref("comments", order_by = id), primaryjoin = "and_(DoctorProfile.id == DoctorComment.doctor_id, DoctorComment.active == 0)")
+    content = Column(Text)
+
 
 
 class NurseProfile(DeclarativeBase, SysMixin):
@@ -84,7 +122,7 @@ class NurseProfile(DeclarativeBase, SysMixin):
 
     id = Column(Integer, autoincrement = True, primary_key = True)
     user_id = Column(Integer)
-    desc = Column(Unicode(1000))
+    desc = Column(Text)
 
 
 
@@ -95,10 +133,10 @@ class Events(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     user_id = Column(Integer)
     doctor_id = Column(Integer)
-    date = Column(Unicode(10))
-    time = Column(Unicode(10))
+    date = Column(Text)
+    time = Column(Text)
     status = Column(Integer, default = 0)
-    remark = Column(Unicode(1000))
+    remark = Column(Text)
 
     def showStatus(self):
         return {
@@ -123,9 +161,9 @@ class Message(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     user_id = Column(Integer, ForeignKey('system_user.id'))
     user = relation(User, backref = backref("messages", order_by = id), primaryjoin = "and_(User.id == Message.user_id, Message.active == 0)")
-    subject = Column(Unicode(200))
-    content = Column(Unicode(1000))
-    type = Column(Unicode(20))
+    subject = Column(Text)
+    content = Column(Text)
+    type = Column(Text)
     status = Column(Integer, default = 0)
 
 
@@ -138,7 +176,7 @@ class Holiday(DeclarativeBase, SysMixin):
     year = Column(Integer)
     month = Column(Integer)
     day = Column(Integer)
-    region = Column(Unicode(10))
+    region = Column(Text)
 
     @classmethod
     def isHoliday(clz, d):
@@ -164,24 +202,8 @@ class UploadFile(DeclarativeBase, SysMixin):
     __tablename__ = 'system_upload_file'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(100))
-    path = Column(Unicode(1000))
-    url = Column(Unicode(1000))
-    remark = Column(Unicode(5000))
+    name = Column(Text)
+    path = Column(Text)
+    url = Column(Text)
+    remark = Column(Text)
 
-
-
-class District(DeclarativeBase, SysMixin):
-    __tablename__ = 'district'
-
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(100))
-
-
-class Area(DeclarativeBase, SysMixin):
-    __tablename__ = 'area'
-
-    id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(100))
-    district_id = Column(Integer, ForeignKey('district.id'))
-    district = relation(District, backref = backref("area", order_by = id), primaryjoin = "and_(District.id == Area.district_id, Area.active == 0)")

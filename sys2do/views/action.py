@@ -253,3 +253,8 @@ def search():
 
     paginate_clinics = Page(cs, page = page, items_per_page = ITEM_PER_PAGE, url = lambda page:"%s?d=%s&q=%s&page=%d" % (url_for("search"), d or '', q or '', page))
     return render_template("search.html", paginate_clinics = paginate_clinics, q = q or '', d = d or '')
+
+
+
+def rating():
+    pass

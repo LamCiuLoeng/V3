@@ -12,9 +12,9 @@ def init():
         metadata.create_all(engine)
 
         #add the HK holiday 
-        for d in ["0101", "0203", "0204", "0205", "0405", "0423", "0425", "0502", "0510",
-              "0606", "0701", "0913", "1001", "1005", "1226", "1227"]:
-            DBSession.add(Holiday(year = 2011, month = d[:2], day = d[2:], region = 'HK'))
+        for d in ["0102", "0123", "0124", "012", "0404", "0406", "0407", "0409", "0428",
+              "0501", "0623", "0702", "1001", "1002", "1023", "1225", "1226"]:
+            DBSession.add(Holiday(year = 2012, month = d[:2], day = d[2:], region = 'HK'))
 
         permissions = ["ORDER_ADD", "ORDER_VIEW", "ORDER_CANCEL", "ORDER_UPDATE", "ORDER_VIEW_ALL",
                    "CLINIC_ADD", "CLINIC_VIEW", "CLINIC_VIEW_ALL", "CLINIC_UPDATE", "CLINIC_DELETE",

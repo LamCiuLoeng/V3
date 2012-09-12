@@ -4,6 +4,7 @@ from PIL import Image
 import os
 from datetime import datetime as dt
 from flask import g, render_template, flash, session, redirect, url_for, request
+from webhelpers.paginate import Page
 from sqlalchemy import and_
 from sqlalchemy.sql.expression import desc
 
@@ -13,6 +14,8 @@ from flask.helpers import jsonify
 from sys2do.util.decorator import templated, login_required, has_all_permissions
 from sys2do.util.common import _g, MESSAGE_ERROR, MESSAGE_INFO, upload
 from sys2do.setting import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, UPLOAD_FOLDER_URL
+from sys2do.model.logic import Clinic
+
 
 
 
@@ -68,22 +71,27 @@ def logout_handler():
     return redirect("/login")
 
 
+@templated("search.html")
 def search():
-    q = request.values.get('q', None)
-    r = connection.Role.one({"name":"DOCTOR"})
-    contain = {"$regex" : "/.*%s.*/i" % q}
-    contain = "/.*%s.*/i" % q
-    #search the user
-    us = connection.User.find({
-                               'active' : 0,
-                               'roles':{'$all':[r.id]},
-                               '$or':[{'first_name' : contain},
-#                                      {'last_name' : contain},
-                                 ]
-                          })
-    data = [u.populate() for u in us]
-    app.logger.info(data)
-    return jsonify(data)
+    try:
+        page = request.values.get("page", 1)
+    except:
+        page = 1
+
+    condition = [Clinic.active == 0, ]
+    a = request.values.get('area_id', '') or ''
+    q = request.values.get('value', '') or ''
+    if not a:
+        condition.append(Clinic.name.like('%%%s%%' % q))
+    else:
+        condition.extend([Clinic.area_id == a, Clinic.name.like('%%%s%%' % q)])
+
+    result = DBSession.query(Clinic).filter(and_(*condition)).order_by(Clinic.name)
+    paginate_clinics = Page(result, page = page, items_per_page = 5, url = lambda page:"%s?area_id=%s&value=%s&page=%d" % (url_for("search"), a, q, page))
+    return {"clinics" :paginate_clinics}
+
+
+
 
 @templated("register.html")
 def register():

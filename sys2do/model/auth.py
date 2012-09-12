@@ -9,7 +9,7 @@ except ImportError:
              'Please install it. Example: easy_install hashlib')
 
 from sqlalchemy import Table, ForeignKey, Column
-from sqlalchemy.types import Unicode, Integer, DateTime, Date
+from sqlalchemy.types import Unicode, Integer, DateTime, Date, Text
 from sqlalchemy.orm import relation
 
 from sys2do.model import DeclarativeBase, metadata, DBSession
@@ -64,9 +64,9 @@ class Group(DeclarativeBase, SysMixin):
     __tablename__ = 'system_group'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(100), unique = True, nullable = False)
-    display_name = Column(Unicode(100))
-    desc = Column(Unicode(1000))
+    name = Column(Text, unique = True, nullable = False)
+    display_name = Column(Text)
+    desc = Column(Text)
     users = relation('User', secondary = user_group_table, backref = 'groups')
 
     def __repr__(self): return self.display_name or self.name
@@ -79,13 +79,13 @@ class User(DeclarativeBase, SysMixin):
     __tablename__ = 'system_user'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    email = Column(Unicode(100), unique = True, nullable = False)
-    password = Column(Unicode(50))
-    first_name = Column(Unicode(50))
-    last_name = Column(Unicode(50))
-    phone = Column(Unicode(50))
+    email = Column(Text, unique = True, nullable = False)
+    password = Column(Text)
+    first_name = Column(Text)
+    last_name = Column(Text)
+    phone = Column(Text)
     birthday = Column(Date, default = None)
-    image_url = Column(Unicode(100))
+    image_url = Column(Text)
 
     def __str__(self): return "%s %s" % (self.first_name, self.last_name)
 
@@ -118,8 +118,8 @@ class Permission(DeclarativeBase, SysMixin):
     __tablename__ = 'system_permission'
 
     id = Column(Integer, autoincrement = True, primary_key = True)
-    name = Column(Unicode(100), unique = True, nullable = False)
-    desc = Column(Unicode(1000))
+    name = Column(Text, unique = True, nullable = False)
+    desc = Column(Text)
     groups = relation(Group, secondary = group_permission_table, backref = 'permissions')
 
     def __repr__(self): return self.name
