@@ -10,14 +10,15 @@
 import datetime
 from sqlalchemy import Table, ForeignKey, Column, Date, Time
 from sqlalchemy.types import Unicode, Integer, DateTime, Text
-from sqlalchemy.orm import relation, backref
+from sqlalchemy.orm import relation, backref, relationship
 from sqlalchemy.sql.expression import and_
 
 from sys2do.model import DeclarativeBase, metadata, DBSession
 from auth import SysMixin, User
 from sys2do.util.sa_helper import JSONColumn
 
-__all__ = ['Clinic', 'DoctorProfile', 'NurseProfile', 'Events', 'Message', 'Holiday', 'UploadFile', 'District', 'Area']
+__all__ = ['Clinic', 'DoctorProfile', 'NurseProfile', 'Events', 'Message', 'Holiday',
+           'UploadFile', 'District', 'Area', 'clinic_doctor_table', 'clinic_nurse_table']
 
 
 class District(DeclarativeBase, SysMixin):
@@ -25,6 +26,7 @@ class District(DeclarativeBase, SysMixin):
 
     id = Column(Integer, autoincrement = True, primary_key = True)
     name = Column(Text)
+    name_tc = Column(Text)
 
 
 class Area(DeclarativeBase, SysMixin):
@@ -32,9 +34,9 @@ class Area(DeclarativeBase, SysMixin):
 
     id = Column(Integer, autoincrement = True, primary_key = True)
     name = Column(Text)
+    name_tc = Column(Text)
     district_id = Column(Integer, ForeignKey('district.id'))
     district = relation(District, backref = backref("area", order_by = id), primaryjoin = "and_(District.id == Area.district_id, Area.active == 0)")
-
 
 
 
@@ -44,6 +46,7 @@ clinic_doctor_table = Table('clinic_doctor', metadata,
     Column('doctor_id', Integer, ForeignKey('doctor_profile.id',
         onupdate = "CASCADE", ondelete = "CASCADE"), primary_key = True)
 )
+
 
 clinic_nurse_table = Table('clinic_nurse', metadata,
     Column('clinic_id', Integer, ForeignKey('clinic.id',
@@ -61,6 +64,7 @@ class Clinic(DeclarativeBase, SysMixin):
     code = Column(Text)
     name = Column(Text)
     address = Column(Text)
+    address_tc = Column(Text)
     desc = Column(Text)
     tel = Column(Text)
     website = Column(Text)
@@ -71,10 +75,11 @@ class Clinic(DeclarativeBase, SysMixin):
     nurses = relation('NurseProfile', secondary = clinic_nurse_table, backref = 'clinics')
     area_id = Column(Integer, ForeignKey('area.id'))
     area = relation(Area, backref = backref("clinics", order_by = id), primaryjoin = "and_(Area.id == Clinic.area_id, Clinic.active == 0)")
-
+    coordinate = Column(Text)
 
     def __str__(self): return self.name
     def __repr__(self): return self.name
+
 
 
 class DoctorProfile(DeclarativeBase, SysMixin):
@@ -86,7 +91,6 @@ class DoctorProfile(DeclarativeBase, SysMixin):
     worktime_setting = Column(JSONColumn(5000))
     rating_score = Column(Integer, default = 0)
     rating_count = Column(Integer, default = 0)
-
 
     def getUserProfile(self):
         user = DBSession.query(User).get(self.user_id)

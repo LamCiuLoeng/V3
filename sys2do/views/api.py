@@ -6,13 +6,17 @@
 #  Description:
 ###########################################
 '''
+import traceback
 from flask.globals import request
 from flask.helpers import jsonify
 from sys2do.util.common import _g
 from sys2do.model import DBSession
-from sqlalchemy.sql.expression import and_, desc
+from sqlalchemy.sql.expression import and_, desc, func
 from sys2do.model.auth import User
-from sys2do.model.logic import DoctorProfile, DoctorComment, Clinic, District
+from sys2do.model.logic import DoctorProfile, DoctorComment, Clinic, District, \
+    Area
+from sys2do import app
+from sys2do.model.logic import clinic_doctor_table
 
 MSG_NO_SUCH_METHOD = "No such api function"
 MSG_PARAMS_MISSING = "params missing"
@@ -22,11 +26,16 @@ MSG_VALIDATE_SUCCESS = "login success"
 MSG_PARAMS_EMPTY = "The field(s) should not empty!"
 MSG_SERVER_ERROR = "There's error occur on the server side!"
 MSG_SAVE_SUCCESS = "Save the record successfully!"
+MSG_EMAIL_BLANK_ERROR = "The email could not be blank!"
+MSG_PASSWORD_BLANK_ERROR = "The password could not be blank!"
+MSG_PASSWORD_NOT_MATCH = "The password and repassword are not the same!"
+MSG_EMAIL_EXIST = "The email is already exist!"
+
 
 
 def doAction():
     action = _g('action', None)
-    if action not in ['login', 'getLocationData', 'getDoctorList', 'getDoctorDetail', 'getComment', 'addComment']:
+    if action not in ['login', 'register', 'getLocationData', 'getDoctorList', 'getDoctorDetail', 'getComment', 'addComment']:
         return jsonify({'result' : 0 , 'msg' : MSG_NO_SUCH_METHOD})
 
     return eval("%s()" % action)
@@ -60,8 +69,12 @@ def login():
 
     username = _g('userName')
     password = _g('password')
+
+    if not username : return jsonify({'result' : 0 , 'msg' : MSG_EMAIL_BLANK_ERROR})
+    if not password : return jsonify({'result' : 0 , 'msg' : MSG_PASSWORD_BLANK_ERROR})
+
     try:
-        user = DBSession.query(User).filter(and_(User.active == 0 , User.email == username)).one()
+        user = DBSession.query(User).filter(and_(User.active == 0 , func.upper(User.email) == username.upper())).one()
         if user.password != password:
             return jsonify({'result' : 0 , 'msg' : MSG_WRONG_PASSWORD})
     except:
@@ -73,6 +86,37 @@ def login():
                               "name": unicode(user)
                               }
                     })
+
+
+
+def register():
+    fields = ['email', 'password', 'repassword']
+    if _check_params(fields) != 0 : return jsonify({'result' : 0 , 'msg' : MSG_PARAMS_MISSING})
+
+    email = _g('email')
+    password = _g('password')
+    repassword = _g('repassword')
+
+    if not email : return jsonify({'result' : 0 , 'msg' : MSG_EMAIL_BLANK_ERROR})
+    if not password : return jsonify({'result' : 0 , 'msg' : MSG_PASSWORD_BLANK_ERROR})
+    if password != repassword : return jsonify({'result' : 0 , 'msg' : MSG_PASSWORD_NOT_MATCH})
+
+    try:
+        DBSession.query(User).filter(and_(User.active == 0, func.upper(User.email) == email.upper())).one()
+        return jsonify({'result' : 0 , 'msg' : MSG_EMAIL_EXIST})
+    except:
+        traceback.print_exc()
+        pass
+    display_name = _g('display_name') or email
+    try:
+        u = User(email = email, password = password, display_name = display_name)
+        DBSession.add(u)
+        DBSession.commit()
+        return jsonify({'result' : 1 , 'msg' : MSG_SAVE_SUCCESS, 'id' : u.id , 'point' : u.point})
+    except:
+        traceback.print_exc()
+        return jsonify({'result' : 0 , 'msg' : MSG_SERVER_ERROR})
+
 
 #===============================================================================
 # params : lang : the language code
@@ -86,21 +130,42 @@ def getLocationData():
     if _check_params(fields) != 0 : return jsonify({'result' : 0 , 'msg' : MSG_PARAMS_MISSING})
 
     data = []
-    for d in DBSession.query(District).filter(and_(District.active == 0)):
-        dInfo = {"id" : d.id , "name" : d.name, "children" : []}
-        for a in d.area:
-            aInfo = {"id" : a.id, "name" : a.name , "children" : []}
-            for c in a.clinics:
-                for d in c.doctors:
-                    aInfo['children'].append({
-                                              "doctorID" : d.id,
-                                              "name" : d.name,
-                                              "location" : c.address,
-                                              })
-            dInfo["children"].append(aInfo)
-        data.append(dInfo)
-    return jsonify({'result' : 1 , "data" : data})
+    lang = _g('lang')
+    for (u, d, c, a, dd) in DBSession.query(User, DoctorProfile, Clinic, Area, District).filter(and_(
+                                                                         User.id == DoctorProfile.user_id,
+                                                                         Clinic.id == clinic_doctor_table.c.clinic_id,
+                                                                         DoctorProfile.id == clinic_doctor_table.c.doctor_id,
+                                                                         Clinic.area_id == Area.id,
+                                                                         Area.district_id == District.id,
+                                                                         )):
+        for dtmp in data:
+            if dtmp['id'] == dd.id:
+                dInfo = dtmp
+                break
+        else:
+            dInfo = {"id" : dd.id ,
+                     "name" : dd.name_tc if lang == 'zh_HK' else dd.name,
+                     "children" : []}
+            data.append(dInfo)
 
+        for atmp in dInfo['children']:
+            if atmp['id'] == a.id:
+                aInfo = atmp
+                break
+        else:
+            aInfo = {"id" : a.id,
+                     "name" : a.name_tc if lang == 'zh_HK' else a.name,
+                     "children" : []}
+            dInfo['children'].append(aInfo)
+
+
+        aInfo['children'].append({
+                      "doctorID" : d.id,
+                      "name" : unicode(u),
+                      "location" : c.address_tc if lang == 'zh_HK' else c.address,
+                      })
+
+    return jsonify({'result' : 1 , "data" : data})
 
 
 
@@ -113,15 +178,19 @@ def getDoctorList():
     if _check_params(fields) != 0 : return jsonify({'result' : 0 , 'msg' : MSG_PARAMS_MISSING})
 
     ds = []
+    lang = _g('lang')
     locationIndex = _g('locationIndex')
     for c in DBSession.query(Clinic).filter(and_(Clinic.active == 0, Clinic.area_id == locationIndex)):
+        latitude = longtitude = None
+        if c.coordinate:
+            latitude, longtitude = c.coordinate.split(",")
         for d in c.doctors:
             ds.append({
                        "doctorID" : c.id,
                        "name"     : c.name,
-                       "latitude" : None,
-                       "longtitude" : None,
-                       "address"    : c.address,
+                       "latitude" : latitude,
+                       "longtitude" : longtitude,
+                       "address"    : c.address_tc if lang == 'zh_HK' else c.address,
                        })
 
     return jsonify({"result" : 1 , "data" : ds})

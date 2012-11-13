@@ -81,17 +81,19 @@ class User(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     email = Column(Text, unique = True, nullable = False)
     password = Column(Text)
-    first_name = Column(Text)
-    last_name = Column(Text)
+    display_name = Column(Text)
+#    first_name = Column(Text)
+#    last_name = Column(Text)
     phone = Column(Text)
     birthday = Column(Date, default = None)
     image_url = Column(Text)
+    point = Column(Integer, default = 0)
 
-    def __str__(self): return "%s %s" % (self.first_name, self.last_name)
+    def __str__(self): return self.display_name
 
-    def __repr__(self): return "%s %s" % (self.first_name, self.last_name)
+    def __repr__(self): return self.display_name
 
-    def __unicode__(self): return "%s %s" % (self.first_name, self.last_name)
+    def __unicode__(self): return self.display_name
 
     @property
     def permissions(self):
@@ -106,8 +108,7 @@ class User(DeclarativeBase, SysMixin):
         return {
                 'id' : self.id,
                 'email' : self.email,
-                'first_name' : self.first_name,
-                'last_name' : self.last_name,
+                'display_name' : self.display_name,
                 'image_url' : self.image_url,
                 'phone' : self.phone,
                 'name' : unicode(self)

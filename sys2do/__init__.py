@@ -4,7 +4,7 @@ from flask import Flask, Module
 
 __all__ = ["app"]
 
-app = Flask(__name__, static_path = '/static')
+app = Flask(__name__, static_url_path = '/static')
 app.config.from_object("sys2do.setting")
 
 #if not app.debug:
