@@ -63,6 +63,7 @@ class Clinic(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     code = Column(Text)
     name = Column(Text)
+    name_tc = Column(Text)
     address = Column(Text)
     address_tc = Column(Text)
     desc = Column(Text)

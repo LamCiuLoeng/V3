@@ -25,7 +25,7 @@ class SysMixin(object):
     create_by_id = Column(Integer, default = getUserID)
     update_time = Column(DateTime, default = dt.now, onupdate = dt.now)
     update_by_id = Column(Integer, default = getUserID, onupdate = getUserID)
-    active = Column(Integer, default = 0) # 0 is active ,1 is inactive
+    active = Column(Integer, default = 0)  # 0 is active ,1 is inactive
 
     @property
     def create_by(self):
@@ -36,7 +36,7 @@ class SysMixin(object):
         return DBSession.query(User).get(self.update_by_id)
 
 
-#{ Association tables
+# { Association tables
 
 
 # This is the association table for the many-to-many relationship between
@@ -66,6 +66,7 @@ class Group(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     name = Column(Text, unique = True, nullable = False)
     display_name = Column(Text)
+
     desc = Column(Text)
     users = relation('User', secondary = user_group_table, backref = 'groups')
 
@@ -82,6 +83,7 @@ class User(DeclarativeBase, SysMixin):
     email = Column(Text, unique = True, nullable = False)
     password = Column(Text)
     display_name = Column(Text)
+    display_name_tc = Column(Text)
 #    first_name = Column(Text)
 #    last_name = Column(Text)
     phone = Column(Text)
@@ -109,6 +111,7 @@ class User(DeclarativeBase, SysMixin):
                 'id' : self.id,
                 'email' : self.email,
                 'display_name' : self.display_name,
+                'display_name_tc' : self.display_name_tc,
                 'image_url' : self.image_url,
                 'phone' : self.phone,
                 'name' : unicode(self)

@@ -161,7 +161,7 @@ def getLocationData():
 
         aInfo['children'].append({
                       "doctorID" : d.id,
-                      "name" : unicode(u),
+                      "name" : u.display_name_tc if lang == 'zh_HK' else u.display_name,
                       "location" : c.address_tc if lang == 'zh_HK' else c.address,
                       })
 
@@ -186,8 +186,9 @@ def getDoctorList():
             latitude, longtitude = c.coordinate.split(",")
         for d in c.doctors:
             ds.append({
-                       "doctorID" : c.id,
-                       "name"     : c.name,
+                       "doctorID" : d.id,
+                       "clinicID" : c.id,
+                       "name"     : c.name_tc if lang == 'zh_HK' else c.name,
                        "latitude" : latitude,
                        "longtitude" : longtitude,
                        "address"    : c.address_tc if lang == 'zh_HK' else c.address,
@@ -203,22 +204,27 @@ def getDoctorList():
 #          data : the detail of the doctor
 #===============================================================================
 def getDoctorDetail():
-    fields = ['lang', 'doctorID']
+    fields = ['lang', 'doctorID', 'clinicID']
     if _check_params(fields) != 0 : return jsonify({'result' : 0 , 'msg' : MSG_PARAMS_MISSING})
 
+    lang = _g('lang')
     dp = DBSession.query(DoctorProfile).get(_g('doctorID'))
     base_info = dp.getUserProfile()
 
+    c = DBSession.query(Clinic).get(_g('clinicID'))
+    latitude = longtitude = None
+    if c.coordinate:
+        latitude, longtitude = c.coordinate.split(",")
     return jsonify({
                     "result" : 1,
                     "data"   : {
                                 "doctorID"  : dp.id,
-                                "name"      : dp.name,
+                                "name"      : base_info['display_name_tc'] if lang == 'zh_HK' else base_info['display_name'],
                                 "desc"      : dp.desc,
-                                "address"   : None,
+                                "address"   : c.address_tc if lang == 'zh_HK' else c.address,
                                 "image"     : base_info['image_url'],
-                                "mapLocationX" : None,
-                                "mapLocationY" : None,
+                                "mapLocationX" : longtitude,
+                                "mapLocationY" : latitude,
                                 "rating": dp.rating,
                                 }
                     })
