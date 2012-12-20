@@ -161,6 +161,7 @@ def getLocationData():
 
         aInfo['children'].append({
                       "doctorID" : d.id,
+                      "clinicID" : c.id,
                       "name" : u.display_name_tc if lang == 'zh_HK' else u.display_name,
                       "location" : c.address_tc if lang == 'zh_HK' else c.address,
                       })
@@ -221,6 +222,7 @@ def getDoctorDetail():
                                 "doctorID"  : dp.id,
                                 "name"      : base_info['display_name_tc'] if lang == 'zh_HK' else base_info['display_name'],
                                 "desc"      : dp.desc,
+                                "tel"       : c.tel,
                                 "address"   : c.address_tc if lang == 'zh_HK' else c.address,
                                 "image"     : base_info['image_url'],
                                 "mapLocationX" : longtitude,
