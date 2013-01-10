@@ -84,6 +84,7 @@ class User(DeclarativeBase, SysMixin):
     password = Column(Text)
     display_name = Column(Text)
     display_name_tc = Column(Text)
+    display_name_sc = Column(Text)
 #    first_name = Column(Text)
 #    last_name = Column(Text)
     phone = Column(Text)
@@ -112,6 +113,7 @@ class User(DeclarativeBase, SysMixin):
                 'email' : self.email,
                 'display_name' : self.display_name,
                 'display_name_tc' : self.display_name_tc,
+                'display_name_sc' : self.display_name_sc,
                 'image_url' : self.image_url,
                 'phone' : self.phone,
                 'name' : unicode(self)

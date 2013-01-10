@@ -27,6 +27,7 @@ class District(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     name = Column(Text)
     name_tc = Column(Text)
+    name_sc = Column(Text)
 
 
 class Area(DeclarativeBase, SysMixin):
@@ -35,6 +36,7 @@ class Area(DeclarativeBase, SysMixin):
     id = Column(Integer, autoincrement = True, primary_key = True)
     name = Column(Text)
     name_tc = Column(Text)
+    name_sc = Column(Text)
     district_id = Column(Integer, ForeignKey('district.id'))
     district = relation(District, backref = backref("area", order_by = id), primaryjoin = "and_(District.id == Area.district_id, Area.active == 0)")
 
@@ -64,8 +66,10 @@ class Clinic(DeclarativeBase, SysMixin):
     code = Column(Text)
     name = Column(Text)
     name_tc = Column(Text)
+    name_sc = Column(Text)
     address = Column(Text)
     address_tc = Column(Text)
+    address_sc = Column(Text)
     desc = Column(Text)
     tel = Column(Text)
     website = Column(Text)

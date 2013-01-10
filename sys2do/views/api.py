@@ -144,7 +144,7 @@ def getLocationData():
                 break
         else:
             dInfo = {"id" : dd.id ,
-                     "name" : dd.name_tc if lang == 'zh_HK' else dd.name,
+                     "name" : {'zh_HK' : dd.name_tc, 'zh_CN' : dd.name_sc}.get(lang, dd.name),
                      "children" : []}
             data.append(dInfo)
 
@@ -153,17 +153,20 @@ def getLocationData():
                 aInfo = atmp
                 break
         else:
+
             aInfo = {"id" : a.id,
-                     "name" : a.name_tc if lang == 'zh_HK' else a.name,
+                     "name" :  {'zh_HK' : a.name_tc, 'zh_CN' : a.name_sc}.get(lang, a.name),
                      "children" : []}
             dInfo['children'].append(aInfo)
 
 
+        {'zh_HK' : c.address_tc, 'zh_CN' :c.address_sc}.get(lang, c.address)
+
         aInfo['children'].append({
                       "doctorID" : d.id,
                       "clinicID" : c.id,
-                      "name" : u.display_name_tc if lang == 'zh_HK' else u.display_name,
-                      "location" : c.address_tc if lang == 'zh_HK' else c.address,
+                      "name" : {'zh_HK' : u.display_name_tc, 'zh_CN' :u.display_name_sc}.get(lang, u.display_name),
+                      "location" : {'zh_HK' : c.address_tc, 'zh_CN' :c.address_sc}.get(lang, c.address),
                       })
 
     return jsonify({'result' : 1 , "data" : data})
@@ -189,10 +192,10 @@ def getDoctorList():
             ds.append({
                        "doctorID" : d.id,
                        "clinicID" : c.id,
-                       "name"     : c.name_tc if lang == 'zh_HK' else c.name,
+                       "name"     : {'zh_HK' : c.name_tc, 'zh_CN' : c.name_sc}.get(lang, c.name),
                        "latitude" : latitude,
                        "longtitude" : longtitude,
-                       "address"    : c.address_tc if lang == 'zh_HK' else c.address,
+                       "address"    : {'zh_HK' : c.address_tc, 'zh_CN' :c.address_sc}.get(lang, c.address),
                        })
 
     return jsonify({"result" : 1 , "data" : ds})
@@ -216,14 +219,15 @@ def getDoctorDetail():
     latitude = longtitude = None
     if c.coordinate:
         latitude, longtitude = c.coordinate.split(",")
+
     return jsonify({
                     "result" : 1,
                     "data"   : {
                                 "doctorID"  : dp.id,
-                                "name"      : base_info['display_name_tc'] if lang == 'zh_HK' else base_info['display_name'],
+                                "name"      : {'zh_HK' : base_info['display_name_tc'], 'zh_CN' :base_info['display_name_sc']}.get(lang, base_info['display_name']),
                                 "desc"      : dp.desc,
                                 "tel"       : c.tel,
-                                "address"   : c.address_tc if lang == 'zh_HK' else c.address,
+                                "address"   : {'zh_HK' : c.address_tc, 'zh_CN' :c.address_sc}.get(lang, c.address),
                                 "image"     : base_info['image_url'],
                                 "mapLocationX" : longtitude,
                                 "mapLocationY" : latitude,
